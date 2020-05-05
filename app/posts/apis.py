@@ -9,13 +9,11 @@ from rest_framework.exceptions import APIException
 from rest_framework.generics import RetrieveAPIView, get_object_or_404
 from rest_framework.parsers import FileUploadParser
 from rest_framework.response import Response
-from rest_framework.views import APIView
 
 from posts.models import PostLike
-from posts.models import PostRoom, PostImage, ComplexInformation
-from posts.serializers import PostLikeSerializer, UploadImageSerializer, SalesFormSerializer
-from posts.serializers import PostListSerializer, PostImageSerializer, AddressSerializer, PostCreateSerializer, \
-    ComplexInformationSerializer
+from posts.models import PostRoom, ComplexInformation
+from posts.serializers import PostLikeSerializer
+from posts.serializers import PostListSerializer, ComplexInformationSerializer
 
 secret = 'V8giduxGZ%2BU463maB552xw3jULhTVPrv%2B7m2qSqu4w8el9fk8bnMD9i6rjUQz7gcUcFnDKyOmcCBztcbVx3Ljg%3D%3D'
 
@@ -101,13 +99,6 @@ class PostDetail(RetrieveAPIView):
         postroom = self.get_object(pk)
         postroom.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-class PostImageView(APIView):
-    def get(self, request):
-        queryset = PostImage.objects.all()
-        serializer = PostImageSerializer(queryset, many=True)
-        return Response(serializer.data)
 
 
 @api_view()
@@ -210,37 +201,3 @@ class PostLikeView(RetrieveAPIView):
         post_like = get_object_or_404(PostLike, post=post, user=request.user)
         post_like.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-class ImageUploadView(APIView):
-    # parser_class = (FileUploadParser,)
-
-    def post(self, request, *args, **kwargs):
-        image_serializer = UploadImageSerializer(data=request.data)
-        if image_serializer.is_valid():
-            image_serializer.save()
-            return Response(image_serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            return Response(image_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class PostCreateView(generics.CreateAPIView):
-    serializer_class = PostCreateSerializer
-
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-
-            # address 객체 생성
-            address_serializer = AddressSerializer(data=request.data.get('address'))
-            if address_serializer.is_valid():
-                address = address_serializer.save()
-            # salesform 객체 생성
-            salesform_serializer = SalesFormSerializer(data=request.data.get('salesForm'))
-            if salesform_serializer.is_valid():
-                salesForm = salesform_serializer.save()
-
-            serializer.save(address=address, salesForm=salesForm)
-
-            return Response(status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

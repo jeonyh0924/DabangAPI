@@ -3,7 +3,6 @@ from django.db import models
 from config import settings
 
 from imagekit.models import ProcessedImageField
-from imagekit.processors import ResizeToFill
 
 
 def post_image_path(instance, filename):
@@ -107,7 +106,6 @@ class PostRoom(models.Model):
 
 
 class PostAddress(models.Model):
-    # address = models.ForeignKey('posts.PostRoom', on_delete=models.CASCADE, null=True)
     loadAddress = models.CharField(max_length=50, null=True, )
     detailAddress = models.CharField(max_length=30, null=True, )
 

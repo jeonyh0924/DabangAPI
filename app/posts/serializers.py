@@ -247,9 +247,3 @@ class PostLikeUserSerializer(serializers.ModelSerializer):
         ]
 
 
-class UploadImageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = UploadImage
-        fields = (
-            'image',
-        )
