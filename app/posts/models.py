@@ -36,9 +36,6 @@ def uploadpost_image_path(instance, filename):
     return a
 
 
-AUTH_USER_MODEL = 'members.User'
-
-
 class PostRoom(models.Model):
     broker = models.ForeignKey(
         'posts.Broker',
@@ -169,7 +166,7 @@ class SecuritySafetyFacilities(models.Model):
 class PostLike(models.Model):
     post = models.ForeignKey('posts.PostRoom', on_delete=models.CASCADE, )
     user = models.ForeignKey(
-        AUTH_USER_MODEL,
+        settings.base.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
     )
 

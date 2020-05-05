@@ -19,6 +19,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__fil
 ROOT_DIR = os.path.dirname(BASE_DIR)
 STATIC_DIR = os.path.join(BASE_DIR, 'static')
 SECRET_DIR = os.path.join(ROOT_DIR, '.secrets')
+TEMPLATES_DIR = os.path.join(BASE_DIR, 'templates')
 
 STATIC_ROOT = os.path.join(ROOT_DIR, '.static')
 STATIC_URL = '/static/'
@@ -50,7 +51,6 @@ AWS_SECRET_ACCESS_KEY = AWS_SECRETS['AWS_S3_SECRET_ACCESS_KEY']
 AWS_STORAGE_BUCKET_NAME = 'dabang'
 AWS_AUTO_CREATE_BUCKET = True
 AWS_S3_REGION_NAME = 'ap-northeast-2'
-
 
 # Application definition
 
@@ -134,7 +134,9 @@ REST_FRAMEWORK = {
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            TEMPLATES_DIR,
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -146,6 +148,11 @@ TEMPLATES = [
         },
     },
 ]
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',  # <- 디폴트 모델 백엔드
+
+)
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators

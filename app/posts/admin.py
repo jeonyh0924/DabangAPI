@@ -69,7 +69,7 @@ class RecommendComplexAdmin(admin.ModelAdmin):
 
 
 class UploadImageAdmin(admin.ModelAdmin):
-    list_display = ['image', ]
+    list_display = ['image',]
 
 
 admin.site.register(UploadImage, UploadImageAdmin)
@@ -91,3 +91,4 @@ admin.site.register(PostLike, PostLIkeAdmin)
 admin.site.register(ComplexInformation, ComplexInformationAdmin)
 admin.site.register(ComplexImage, ComplexImageAdmin)
 admin.site.register(RecommendComplex, RecommendComplexAdmin)
+

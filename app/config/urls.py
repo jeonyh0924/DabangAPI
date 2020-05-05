@@ -13,9 +13,27 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
+from rest_framework_jwt.views import obtain_jwt_token, verify_jwt_token, refresh_jwt_token
+
+from config import settings
+from members import views
+from members.urls import urlpatterns_members
+from posts.urls import urlpatterns_posts
 
 urlpatterns = [
+    # path('auth/', include('rest_framework_social_oauth2.urls')), # rest_framework_social_oauth2
+
+    path('api/token/', obtain_jwt_token),  # djangorestframework-jwt
+    path('api/token/verify/', verify_jwt_token),  # djangorestframework-jwt
+    path('api/token/refresh/', refresh_jwt_token),  # djangorestframework-jwt
+
     path('admin/', admin.site.urls),
+    path('members/', include(urlpatterns_members)),
+    path('posts/', include(urlpatterns_posts)),
+    path('login/', views.login_page, name='login-page'),  # kakao access token 받기 위한 template
 ]
+
+urlpatterns += static(settings.base.MEDIA_URL, document_root=settings.base.MEDIA_ROOT)

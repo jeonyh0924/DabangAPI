@@ -1,16 +1,13 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-# from config import settings
+from config import settings
 from posts.models import PostRoom, Broker
 
 
 def user_image_path(instance, filename):
     a = f'{instance.id}/{filename}'
     return a
-
-
-AUTH_USER_MODEL = 'members.User'
 
 
 # Create your models he re.
@@ -54,7 +51,7 @@ class SocialLogin(models.Model):
 
 class RecentlyPostList(models.Model):
     user = models.ForeignKey(
-        AUTH_USER_MODEL,
+        settings.base.AUTH_USER_MODEL,
         verbose_name='유저',
         on_delete=models.CASCADE,
     )
@@ -68,7 +65,7 @@ class RecentlyPostList(models.Model):
 
 class ContactToBroker(models.Model):
     user = models.ForeignKey(
-        AUTH_USER_MODEL,
+        settings.base.AUTH_USER_MODEL,
         verbose_name='유저',
         on_delete=models.CASCADE,
     )
