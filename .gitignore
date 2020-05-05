@@ -1,6 +1,8 @@
 # Secret Folder
 .secrets/
-.media
+.config/
+.static/
+.media/
 # Created by https://www.gitignore.io/api/git,linux,macos,python,virtualenv,pycharm+all
 # Edit at https://www.gitignore.io/?templates=git,linux,macos,python,virtualenv,pycharm+all
 
