@@ -7,9 +7,6 @@ from posts.apis import getBorodCityList, getEupMyunDongList, getSiGunGuList, Bro
 urlpatterns_posts = [
     # 포스트 CRUD URLS
     path('test/', apis.PostTinytList.as_view()),
-    path('list/', apis.PostList.as_view()),
-    path('', apis.PostDetail.as_view()),
-
     # 포스트 서브 CRUD URLS
     path('broker/', BrokerAPIView.as_view()),
     path('postLike/', apis.PostLikeView.as_view()),
@@ -23,7 +20,11 @@ urlpatterns_posts = [
 
 router = DefaultRouter()
 router.register('complex', apis.ComplexViewSet)
-
+router.register('address', apis.AddressViewSet)
+router.register('salesForm', apis.SalesFormViewSet)
+router.register('maintenance', apis.MaintenanceFeeViewSet)
+router.register('ss', apis.SecuritySafetyViewSet)
+router.register('post', apis.PostRoomViewSet)
 urlpatterns_posts += [
     path('', include(router.urls))
 ]

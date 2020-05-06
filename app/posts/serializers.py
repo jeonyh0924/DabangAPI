@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import PostRoom, PostImage, Broker, MaintenanceFee, RoomOption, PostAddress, RoomSecurity, SalesForm, \
-    OptionItem, SecuritySafetyFacilities, ComplexInformation, ComplexImage, RecommendComplex, PostLike, UploadImage
+    OptionItem, SecuritySafetyFacilities, ComplexInformation, ComplexImage, RecommendComplex, PostLike
 
 
 class BrokerSerializer(serializers.ModelSerializer):
@@ -16,7 +16,7 @@ class ManagementSerializer(serializers.ModelSerializer):
     class Meta:
         model = MaintenanceFee
         fields = (
-            'postRoom', 'admin', 'totalFee',
+            'pk', 'postRoom', 'admin', 'totalFee',
         )
 
 
@@ -32,6 +32,7 @@ class SecuritySafetySerializer(serializers.ModelSerializer):
     class Meta:
         model = SecuritySafetyFacilities
         fields = (
+            'pk',
             'name',
         )
 
@@ -40,7 +41,7 @@ class AddressSerializer(serializers.ModelSerializer):
     class Meta:
         model = PostAddress
         fields = (
-            'loadAddress', 'detailAddress',
+            'pk', 'loadAddress', 'detailAddress',
         )
 
 
@@ -150,7 +151,7 @@ class PostListSerializer(serializers.ModelSerializer):
     securitySafety_set = serializers.StringRelatedField(source='securitySafety', many=True, read_only=True)
     address = AddressSerializer(read_only=True, allow_null=True)
     salesForm = SalesFormSerializer(read_only=True)
-    postimage = serializers.StringRelatedField(source='postimage_set', many=True)
+    postimage = serializers.StringRelatedField(source='postimage_set', many=True, read_only=True, )
     complex = ComplexInformationSerializer(read_only=True, )
 
     class Meta:
@@ -191,6 +192,13 @@ class PostListSerializer(serializers.ModelSerializer):
             'postimage',
             'complex',
         ]
+
+    def create(self, validated_data):
+        images_data = self.context['request'].FILES
+        post_ins = PostRoom.objects.create(**validated_data)
+        for image_data in images_data.getlist('image'):
+            PostImage.objects.create(image=image_data, post=post_ins)
+        return post_ins
 
 
 class PostLikeSerializer(serializers.ModelSerializer):

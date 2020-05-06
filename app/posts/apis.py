@@ -12,9 +12,10 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
-from posts.models import PostLike, Broker
+from posts.models import PostLike, Broker, PostAddress, SalesForm, MaintenanceFee, SecuritySafetyFacilities
 from posts.models import PostRoom, ComplexInformation
-from posts.serializers import PostLikeSerializer, PostTinySerializer, BrokerSerializer
+from posts.serializers import PostLikeSerializer, PostTinySerializer, BrokerSerializer, AddressSerializer, \
+    SalesFormSerializer, ManagementSerializer, SecuritySafetySerializer
 from posts.serializers import PostListSerializer, ComplexInformationSerializer
 
 secret = 'V8giduxGZ%2BU463maB552xw3jULhTVPrv%2B7m2qSqu4w8el9fk8bnMD9i6rjUQz7gcUcFnDKyOmcCBztcbVx3Ljg%3D%3D'
@@ -39,59 +40,36 @@ class ComplexViewSet(ModelViewSet):
     serializer_class = ComplexInformationSerializer
 
 
+class AddressViewSet(ModelViewSet):
+    queryset = PostAddress.objects.all()
+    serializer_class = AddressSerializer
+
+
+class SalesFormViewSet(ModelViewSet):
+    queryset = SalesForm.objects.all()
+    serializer_class = SalesFormSerializer
+
+
+class MaintenanceFeeViewSet(ModelViewSet):
+    queryset = MaintenanceFee.objects.all()
+    serializer_class = ManagementSerializer
+
+
+class SecuritySafetyViewSet(ModelViewSet):
+    queryset = SecuritySafetyFacilities.objects.all()
+    serializer_class = SecuritySafetySerializer
+
+
+class PostRoomViewSet(ModelViewSet):
+    queryset = PostRoom.objects.all()
+    serializer_class = PostListSerializer
+
+
 class PostTinytList(APIView):
     def get(self, request):
         queryset = PostRoom.objects.all()
         serializer = PostTinySerializer(queryset, many=True)
         return Response(serializer.data)
-
-
-class PostList(generics.ListCreateAPIView):
-    model = PostRoom
-    serializer_class = PostListSerializer
-    queryset = PostRoom.objects.all()
-    parser_class = (FileUploadParser,)
-
-    # 게시물 조회 : /posts/
-    def get(self, request, format=None):
-        queryset = PostRoom.objects.all()
-        serializer = PostListSerializer(queryset, many=True)
-        return Response(serializer.data)
-
-
-class PostDetail(RetrieveAPIView):
-    serializer_class = PostListSerializer
-
-    def get_object(self):
-        pk = self.request.query_params.get('pk', None)
-        try:
-            return PostRoom.objects.get(pk=pk)
-        except PostRoom.DoesNotExist:
-            raise Http404
-
-    def get_queryset(self):
-        self.request.query_params.get()
-
-    # # 특정 게시물 조회 : /posts/{pk}/
-    # def get(self, request, pk):Î
-    #     postroom = self.get_object(pk)
-    #     serializer = PostListSerializer(postroom)
-    #     return Response(serializer.data)
-
-    # 특정 게시물 수정 : /posts/{pk}/
-    def patch(self, request, pk, format=None):
-        postroom = self.get_object(pk)
-        serializer = PostListSerializer(postroom, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    # 특정 게시물 삭제 : /posts/{pk}/
-    def delete(self, request, pk, format=None):
-        postroom = self.get_object(pk)
-        postroom.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 @api_view()
