@@ -2,6 +2,7 @@ from django.db import models
 
 from config import settings
 
+
 def post_image_path(instance, filename):
     a = f'{instance.id}/{filename}'
     return a
@@ -33,6 +34,10 @@ def uploadpost_image_path(instance, filename):
 
 
 class PostRoom(models.Model):
+    author = models.ForeignKey(
+        settings.base.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+    )
     broker = models.ForeignKey(
         'posts.Broker',
         on_delete=models.SET_NULL,

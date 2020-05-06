@@ -79,6 +79,7 @@ class PostTestAPIVie(APIView):
         pass
 
     def post(self, request):
+        author = request.user
         broker_pk = request.data.get('broker')
         broker_ins = get_object_or_404(Broker, pk=broker_pk)
 
@@ -101,12 +102,12 @@ class PostTestAPIVie(APIView):
         secusafe = secusafe.split(',')
 
         post_ins = PostRoom.objects.create(
+            author=author,
             broker=broker_ins,
             complex=complex_ins,
             address=address_ins,
             salesForm=salesForm_ins,
         )
-
         images_data = request.FILES
         for image_data in images_data.getlist('image'):
             PostImage.objects.create(image=image_data, post=post_ins)
@@ -125,10 +126,14 @@ class PostTestAPIVie(APIView):
                 ss_ins = get_object_or_404(SecuritySafetyFacilities, pk=ss_pk)
                 RoomSecurity.objects.create(postRoom=post_ins, security=ss_ins)
 
-        serializer = PostListSerializer(post_ins)
-        # if serializer.is_valid():
+        serializer = PostListSerializer(data=post_ins)
+
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-        # return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+    def patch(self, request):
+        queryset = PostRoom.objects.all()
+        permission_classes = (permissions.IsAuthenticated,)
 
 
 class PostTinytList(APIView):
