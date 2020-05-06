@@ -5,8 +5,9 @@ from posts import apis
 from posts.apis import getBorodCityList, getEupMyunDongList, getSiGunGuList, BrokerAPIView
 
 urlpatterns_posts = [
+    path('test/', apis.PostTestAPIVie.as_view()),
     # 포스트 CRUD URLS
-    path('test/', apis.PostTinytList.as_view()),
+    path('tiny/', apis.PostTinytList.as_view()),
     # 포스트 서브 CRUD URLS
     path('broker/', BrokerAPIView.as_view()),
     path('postLike/', apis.PostLikeView.as_view()),

@@ -2,9 +2,6 @@ from django.db import models
 
 from config import settings
 
-from imagekit.models import ProcessedImageField
-
-
 def post_image_path(instance, filename):
     a = f'{instance.id}/{filename}'
     return a
@@ -48,7 +45,7 @@ class PostRoom(models.Model):
         null=True,
     )
     type = models.CharField('매물 종류', max_length=10, null=True, )
-    description = models.TextField(max_length=500, verbose_name='설명', null=True, )
+    description = models.TextField(max_length=1000, verbose_name='설명', null=True, )
     address = models.ForeignKey(
         'posts.PostAddress',
         on_delete=models.CASCADE, null=True,
@@ -72,15 +69,15 @@ class PostRoom(models.Model):
         through='MaintenanceFee',
     )
 
-    parkingDetail = models.CharField(verbose_name='주차 비용', null=True, max_length=10)
-    parkingTF = models.NullBooleanField('주차 가능 유무', default=None)
-    parkingPay = models.FloatField('주차 비용', null=True, )
+    parkingDetail = models.CharField(verbose_name='주차 비용', null=True, max_length=10, blank=True, )
+    parkingTF = models.NullBooleanField('주차 가능 유무', default=None, null=True, )
+    parkingPay = models.FloatField('주차 비용', null=True, blank=True, )
 
     living_expenses = models.CharField('생활비', null=True, max_length=15, )
     living_expenses_detail = models.CharField('생활비 항목', null=True, max_length=20, )
 
     moveInChar = models.CharField('크롤링용 입주날짜', null=True, max_length=10)
-    moveInDate = models.DateTimeField(verbose_name='입주 가능 날짜', null=True, )
+    moveInDate = models.DateTimeField(verbose_name='입주 가능 날짜', null=True, blank=True, )
     #
     option = models.ManyToManyField('OptionItem', through='RoomOption', verbose_name='옵션 항목')
     heatingType = models.CharField('난방 종류', max_length=10, null=True, )

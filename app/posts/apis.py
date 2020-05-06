@@ -12,10 +12,11 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
-from posts.models import PostLike, Broker, PostAddress, SalesForm, MaintenanceFee, SecuritySafetyFacilities
+from posts.models import PostLike, Broker, PostAddress, SalesForm, MaintenanceFee, SecuritySafetyFacilities, PostImage, \
+    AdministrativeDetail
 from posts.models import PostRoom, ComplexInformation
 from posts.serializers import PostLikeSerializer, PostTinySerializer, BrokerSerializer, AddressSerializer, \
-    SalesFormSerializer, ManagementSerializer, SecuritySafetySerializer
+    SalesFormSerializer, ManagementSerializer, SecuritySafetySerializer, PostCreateSerializer
 from posts.serializers import PostListSerializer, ComplexInformationSerializer
 
 secret = 'V8giduxGZ%2BU463maB552xw3jULhTVPrv%2B7m2qSqu4w8el9fk8bnMD9i6rjUQz7gcUcFnDKyOmcCBztcbVx3Ljg%3D%3D'
@@ -62,7 +63,56 @@ class SecuritySafetyViewSet(ModelViewSet):
 
 class PostRoomViewSet(ModelViewSet):
     queryset = PostRoom.objects.all()
-    serializer_class = PostListSerializer
+
+    def get_serializer_class(self):
+        if self.action in "create":
+            serializer_class = PostListSerializer
+            return serializer_class
+
+        else:
+            serializer_class = PostListSerializer
+            return serializer_class
+
+
+class PostTestAPIVie(APIView):
+    def get(self, request):
+        pass
+
+    def post(self, request):
+        broker_pk = request.data.get('broker')
+        broker_ins = get_object_or_404(Broker, pk=broker_pk)
+
+        complex_pk = request.data.get('complex')
+        complex_ins = get_object_or_404(ComplexInformation, pk=complex_pk)
+
+        address_pk = request.data.get('address')
+        address_ins = get_object_or_404(PostAddress, pk=address_pk)
+
+        salesForm_pk = request.data.get('salesForm')
+        salesForm_ins = get_object_or_404(SalesForm, pk=salesForm_pk)
+
+        managements = request.data.get('managements')
+        managements = managements.split(',')
+
+        post_ins = PostRoom.objects.create(
+            broker=broker_ins,
+            complex=complex_ins,
+            address=address_ins,
+            salesForm=salesForm_ins,
+        )
+
+        images_data = request.FILES
+        for image_data in images_data.getlist('image'):
+            PostImage.objects.create(image=image_data, post=post_ins)
+
+        for mamagement_pk in managements:
+            manage_ins = AdministrativeDetail.objects.get(pk=mamagement_pk)
+            MaintenanceFee.objects.create(admin=manage_ins, postRoom=post_ins)
+
+        serializer = PostCreateSerializer(post_ins)
+        # if serializer.is_valid():
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        # return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class PostTinytList(APIView):

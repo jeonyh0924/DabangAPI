@@ -19,6 +19,5 @@ urlpatterns_members = [
     path('recently/', getRecentlyPostListView),
     path('contactTo/', getContactToBroker),
 
-
 ]
 urlpatterns_members += router.urls
