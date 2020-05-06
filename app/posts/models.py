@@ -201,7 +201,7 @@ class PostImage(models.Model):
     post = models.ForeignKey(
         'posts.postRoom',
         verbose_name='해당 게시글',
-        on_delete=models.CASCADE, related_name='postimage_set'
+        on_delete=models.CASCADE,
     )
 
     def __str__(self):
