@@ -10,54 +10,39 @@ from rest_framework.generics import RetrieveAPIView, get_object_or_404
 from rest_framework.parsers import FileUploadParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.viewsets import ModelViewSet
 
-from posts.models import PostLike
+from posts.models import PostLike, Broker
 from posts.models import PostRoom, ComplexInformation
-from posts.serializers import PostLikeSerializer, TestSerializer
+from posts.serializers import PostLikeSerializer, PostTinySerializer, BrokerSerializer
 from posts.serializers import PostListSerializer, ComplexInformationSerializer
 
 secret = 'V8giduxGZ%2BU463maB552xw3jULhTVPrv%2B7m2qSqu4w8el9fk8bnMD9i6rjUQz7gcUcFnDKyOmcCBztcbVx3Ljg%3D%3D'
 
 
-@api_view()
-def ComplexAPIView(request):
+class BrokerAPIView(APIView):
+    def get(self, requset):
+        queryset = Broker.objects.all()
+        serializer = BrokerSerializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        serializer = BrokerSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ComplexViewSet(ModelViewSet):
     queryset = ComplexInformation.objects.all()
-    serializer = ComplexInformationSerializer(queryset, many=True, )
-    return Response(serializer.data, status=status.HTTP_200_OK)
+    serializer_class = ComplexInformationSerializer
 
 
-@api_view()
-def ComplexDetail(request):
-    pk = request.query_params.get('pk')
-    if pk:
-        complex_ins = ComplexInformation.objects.get(pk=pk)
-        serializer = ComplexInformationSerializer(complex_ins)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    else:
-        data = {
-            'message': '존재하지 않는 단지 정보 입니다.'
-        }
-        return Response(data, status=status.HTTP_404_NOT_FOUND)
-
-
-@api_view()
-def ComplexDetail(request):
-    pk = request.query_params.get('pk')
-    if pk:
-        complex_ins = ComplexInformation.objects.get(pk=pk)
-        serializer = ComplexInformationSerializer(complex_ins)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    else:
-        data = {
-            'message': '존재하지 않는 단지 정보 입니다.'
-        }
-        return Response(data, status=status.HTTP_404_NOT_FOUND)
-
-
-class PostTestList(APIView):
+class PostTinytList(APIView):
     def get(self, request):
         queryset = PostRoom.objects.all()
-        serializer = TestSerializer(queryset, many=True)
+        serializer = PostTinySerializer(queryset, many=True)
         return Response(serializer.data)
 
 

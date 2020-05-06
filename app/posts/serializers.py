@@ -66,12 +66,6 @@ class RecommendComplexSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class ComplexImageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ComplexImage
-        field = 'image'
-
-
 class ComplexTinySerializer(serializers.ModelSerializer):
     class Meta:
         model = ComplexInformation
@@ -81,8 +75,14 @@ class ComplexTinySerializer(serializers.ModelSerializer):
         ]
 
 
+class ComplexImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ComplexImage
+        field = 'image'
+
+
 class ComplexInformationSerializer(serializers.ModelSerializer):
-    image = serializers.StringRelatedField(source='compleximage_set', many=True, )
+    image = serializers.StringRelatedField(source='compleximage_set', many=True, read_only=True)
     list = serializers.SerializerMethodField()
     countPost = serializers.SerializerMethodField(read_only=True)
 
@@ -134,6 +134,13 @@ class ComplexInformationSerializer(serializers.ModelSerializer):
             'list',
             'countPost',
         )
+
+    def create(self, validated_data):
+        images_data = self.context['request'].FILES
+        complex_ins = ComplexInformation.objects.create(**validated_data)
+        for image_data in images_data.getlist('image'):
+            ComplexImage.objects.create(image=image_data, complex=complex_ins)
+        return complex_ins
 
 
 class PostListSerializer(serializers.ModelSerializer):
@@ -205,7 +212,7 @@ class PostLikeUserSerializer(serializers.ModelSerializer):
         ]
 
 
-class TestSerializer(serializers.ModelSerializer):
+class PostTinySerializer(serializers.ModelSerializer):
     address = AddressSerializer(read_only=True, allow_null=True)
     salesForm = SalesFormSerializer(read_only=True)
     postimage = serializers.StringRelatedField(source='postimage_set', many=True)
