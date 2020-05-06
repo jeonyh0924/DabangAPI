@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import PostRoom, PostImage, Broker, MaintenanceFee, RoomOption, PostAddress, RoomSecurity, SalesForm, \
-    OptionItem, SecuritySafetyFacilities, ComplexInformation, ComplexImage, RecommendComplex, PostLike, UploadImage
+    OptionItem, SecuritySafetyFacilities, ComplexInformation, ComplexImage, RecommendComplex, PostLike
 
 
 class BrokerSerializer(serializers.ModelSerializer):
@@ -16,7 +16,7 @@ class ManagementSerializer(serializers.ModelSerializer):
     class Meta:
         model = MaintenanceFee
         fields = (
-            'postRoom', 'admin', 'totalFee',
+            'pk', 'postRoom', 'admin', 'totalFee',
         )
 
 
@@ -32,6 +32,7 @@ class SecuritySafetySerializer(serializers.ModelSerializer):
     class Meta:
         model = SecuritySafetyFacilities
         fields = (
+            'pk',
             'name',
         )
 
@@ -40,7 +41,7 @@ class AddressSerializer(serializers.ModelSerializer):
     class Meta:
         model = PostAddress
         fields = (
-            'loadAddress', 'detailAddress',
+            'pk', 'loadAddress', 'detailAddress',
         )
 
 
@@ -48,7 +49,12 @@ class SalesFormSerializer(serializers.ModelSerializer):
     class Meta:
         model = SalesForm
         fields = (
-            'type', 'depositChar', 'monthlyChar', 'depositInt', 'monthlyInt',
+            'pk',
+            'type',
+            'depositChar',
+            'monthlyChar',
+            'depositInt',
+            'monthlyInt',
         )
 
 
@@ -66,12 +72,6 @@ class RecommendComplexSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class ComplexImageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ComplexImage
-        field = 'image'
-
-
 class ComplexTinySerializer(serializers.ModelSerializer):
     class Meta:
         model = ComplexInformation
@@ -81,8 +81,14 @@ class ComplexTinySerializer(serializers.ModelSerializer):
         ]
 
 
+class ComplexImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ComplexImage
+        field = 'image'
+
+
 class ComplexInformationSerializer(serializers.ModelSerializer):
-    image = serializers.StringRelatedField(source='compleximage_set', many=True, )
+    image = serializers.StringRelatedField(source='compleximage_set', many=True, read_only=True)
     list = serializers.SerializerMethodField()
     countPost = serializers.SerializerMethodField(read_only=True)
 
@@ -135,15 +141,23 @@ class ComplexInformationSerializer(serializers.ModelSerializer):
             'countPost',
         )
 
+    def create(self, validated_data):
+        images_data = self.context['request'].FILES
+        # broker = re
+        complex_ins = ComplexInformation.objects.create(**validated_data)
+        for image_data in images_data.getlist('image'):
+            ComplexImage.objects.create(image=image_data, complex=complex_ins)
+        return complex_ins
+
 
 class PostListSerializer(serializers.ModelSerializer):
-    broker = BrokerSerializer(read_only=True)
+    broker = BrokerSerializer(read_only=True, )
     management_set = serializers.StringRelatedField(source='management', many=True, read_only=True)
     option_set = serializers.StringRelatedField(source='option', many=True, read_only=True)
     securitySafety_set = serializers.StringRelatedField(source='securitySafety', many=True, read_only=True)
     address = AddressSerializer(read_only=True, allow_null=True)
     salesForm = SalesFormSerializer(read_only=True)
-    postimage = serializers.StringRelatedField(source='postimage_set', many=True)
+    postimage = serializers.StringRelatedField(source='postimage_set', many=True, read_only=True, )
     complex = ComplexInformationSerializer(read_only=True, )
 
     class Meta:
@@ -185,6 +199,13 @@ class PostListSerializer(serializers.ModelSerializer):
             'complex',
         ]
 
+    def create(self, validated_data):
+        images_data = self.context['request'].FILES
+        post_ins = PostRoom.objects.create(**validated_data)
+        for image_data in images_data.getlist('image'):
+            PostImage.objects.create(image=image_data, post=post_ins)
+        return post_ins
+
 
 class PostLikeSerializer(serializers.ModelSerializer):
     class Meta:
@@ -205,7 +226,7 @@ class PostLikeUserSerializer(serializers.ModelSerializer):
         ]
 
 
-class TestSerializer(serializers.ModelSerializer):
+class PostTinySerializer(serializers.ModelSerializer):
     address = AddressSerializer(read_only=True, allow_null=True)
     salesForm = SalesFormSerializer(read_only=True)
     postimage = serializers.StringRelatedField(source='postimage_set', many=True)
@@ -229,3 +250,23 @@ class TestSerializer(serializers.ModelSerializer):
             'complex'
 
         ]
+
+
+class PostCreateSerializer(serializers.ModelSerializer):
+    broker = BrokerSerializer(read_only=True, )
+    complex = ComplexInformationSerializer(read_only=True, )
+    address = AddressSerializer(read_only=True, allow_null=True)
+    salesForm = SalesFormSerializer(read_only=True, )
+
+    class Meta:
+        model = PostRoom
+        fields = [
+            'pk',
+            'broker',
+            'complex',
+            'address',
+            'salesForm',
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super(PostCreateSerializer, self).__init__(*args, **kwargs)

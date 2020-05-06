@@ -10,103 +10,137 @@ from rest_framework.generics import RetrieveAPIView, get_object_or_404
 from rest_framework.parsers import FileUploadParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.viewsets import ModelViewSet
 
-from posts.models import PostLike
+from posts.models import PostLike, Broker, PostAddress, SalesForm, MaintenanceFee, SecuritySafetyFacilities, PostImage, \
+    AdministrativeDetail, OptionItem, RoomOption, RoomSecurity
 from posts.models import PostRoom, ComplexInformation
-from posts.serializers import PostLikeSerializer, TestSerializer
+from posts.serializers import PostLikeSerializer, PostTinySerializer, BrokerSerializer, AddressSerializer, \
+    SalesFormSerializer, ManagementSerializer, SecuritySafetySerializer, PostCreateSerializer
 from posts.serializers import PostListSerializer, ComplexInformationSerializer
 
 secret = 'V8giduxGZ%2BU463maB552xw3jULhTVPrv%2B7m2qSqu4w8el9fk8bnMD9i6rjUQz7gcUcFnDKyOmcCBztcbVx3Ljg%3D%3D'
 
 
-@api_view()
-def ComplexAPIView(request):
-    queryset = ComplexInformation.objects.all()
-    serializer = ComplexInformationSerializer(queryset, many=True, )
-    return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-@api_view()
-def ComplexDetail(request):
-    pk = request.query_params.get('pk')
-    if pk:
-        complex_ins = ComplexInformation.objects.get(pk=pk)
-        serializer = ComplexInformationSerializer(complex_ins)
+class BrokerAPIView(APIView):
+    def get(self, requset):
+        queryset = Broker.objects.all()
+        serializer = BrokerSerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-    else:
-        data = {
-            'message': '존재하지 않는 단지 정보 입니다.'
-        }
-        return Response(data, status=status.HTTP_404_NOT_FOUND)
 
-
-@api_view()
-def ComplexDetail(request):
-    pk = request.query_params.get('pk')
-    if pk:
-        complex_ins = ComplexInformation.objects.get(pk=pk)
-        serializer = ComplexInformationSerializer(complex_ins)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    else:
-        data = {
-            'message': '존재하지 않는 단지 정보 입니다.'
-        }
-        return Response(data, status=status.HTTP_404_NOT_FOUND)
-
-
-class PostTestList(APIView):
-    def get(self, request):
-        queryset = PostRoom.objects.all()
-        serializer = TestSerializer(queryset, many=True)
-        return Response(serializer.data)
-
-
-class PostList(generics.ListCreateAPIView):
-    model = PostRoom
-    serializer_class = PostListSerializer
-    queryset = PostRoom.objects.all()
-    parser_class = (FileUploadParser,)
-
-    # 게시물 조회 : /posts/
-    def get(self, request, format=None):
-        queryset = PostRoom.objects.all()
-        serializer = PostListSerializer(queryset, many=True)
-        return Response(serializer.data)
-
-
-class PostDetail(RetrieveAPIView):
-    serializer_class = PostListSerializer
-
-    def get_object(self):
-        pk = self.request.query_params.get('pk', None)
-        try:
-            return PostRoom.objects.get(pk=pk)
-        except PostRoom.DoesNotExist:
-            raise Http404
-
-    def get_queryset(self):
-        self.request.query_params.get()
-
-    # # 특정 게시물 조회 : /posts/{pk}/
-    # def get(self, request, pk):Î
-    #     postroom = self.get_object(pk)
-    #     serializer = PostListSerializer(postroom)
-    #     return Response(serializer.data)
-
-    # 특정 게시물 수정 : /posts/{pk}/
-    def patch(self, request, pk, format=None):
-        postroom = self.get_object(pk)
-        serializer = PostListSerializer(postroom, data=request.data)
+    def post(self, request):
+        serializer = BrokerSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    # 특정 게시물 삭제 : /posts/{pk}/
-    def delete(self, request, pk, format=None):
-        postroom = self.get_object(pk)
-        postroom.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+
+class ComplexViewSet(ModelViewSet):
+    queryset = ComplexInformation.objects.all()
+    serializer_class = ComplexInformationSerializer
+
+
+class AddressViewSet(ModelViewSet):
+    queryset = PostAddress.objects.all()
+    serializer_class = AddressSerializer
+
+
+class SalesFormViewSet(ModelViewSet):
+    queryset = SalesForm.objects.all()
+    serializer_class = SalesFormSerializer
+
+
+class MaintenanceFeeViewSet(ModelViewSet):
+    queryset = MaintenanceFee.objects.all()
+    serializer_class = ManagementSerializer
+
+
+class SecuritySafetyViewSet(ModelViewSet):
+    queryset = SecuritySafetyFacilities.objects.all()
+    serializer_class = SecuritySafetySerializer
+
+
+class PostRoomViewSet(ModelViewSet):
+    queryset = PostRoom.objects.all()
+
+    def get_serializer_class(self):
+        if self.action in "create":
+            serializer_class = PostListSerializer
+            return serializer_class
+
+        else:
+            serializer_class = PostListSerializer
+            return serializer_class
+
+
+class PostTestAPIVie(APIView):
+    def get(self, request):
+        pass
+
+    def post(self, request):
+        author = request.user
+        broker_pk = request.data.get('broker')
+        broker_ins = get_object_or_404(Broker, pk=broker_pk)
+
+        complex_pk = request.data.get('complex')
+        complex_ins = get_object_or_404(ComplexInformation, pk=complex_pk)
+
+        address_pk = request.data.get('address')
+        address_ins = get_object_or_404(PostAddress, pk=address_pk)
+
+        salesForm_pk = request.data.get('salesForm')
+        salesForm_ins = get_object_or_404(SalesForm, pk=salesForm_pk)
+
+        managements = request.data.get('managements')
+        managements = managements.split(',')
+
+        option = request.data.get('option')
+        option = option.split(',')
+
+        secusafe = request.data.get('secusafe')
+        secusafe = secusafe.split(',')
+
+        post_ins = PostRoom.objects.create(
+            author=author,
+            broker=broker_ins,
+            complex=complex_ins,
+            address=address_ins,
+            salesForm=salesForm_ins,
+        )
+        images_data = request.FILES
+        for image_data in images_data.getlist('image'):
+            PostImage.objects.create(image=image_data, post=post_ins)
+
+        for mamagement_pk in managements:
+            manage_ins = AdministrativeDetail.objects.get(pk=mamagement_pk)
+            MaintenanceFee.objects.create(admin=manage_ins, postRoom=post_ins)
+
+        if option:
+            for option_pk in option:
+                option_ins = get_object_or_404(OptionItem, pk=option_pk)
+                RoomOption.objects.create(postRoom=post_ins, option=option_ins)
+
+        if secusafe:
+            for ss_pk in secusafe:
+                ss_ins = get_object_or_404(SecuritySafetyFacilities, pk=ss_pk)
+                RoomSecurity.objects.create(postRoom=post_ins, security=ss_ins)
+
+        serializer = PostListSerializer(data=post_ins)
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+    def patch(self, request):
+        queryset = PostRoom.objects.all()
+        permission_classes = (permissions.IsAuthenticated,)
+
+
+class PostTinytList(APIView):
+    def get(self, request):
+        queryset = PostRoom.objects.all()
+        serializer = PostTinySerializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 @api_view()

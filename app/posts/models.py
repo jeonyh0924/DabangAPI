@@ -2,8 +2,6 @@ from django.db import models
 
 from config import settings
 
-from imagekit.models import ProcessedImageField
-
 
 def post_image_path(instance, filename):
     a = f'{instance.id}/{filename}'
@@ -36,6 +34,10 @@ def uploadpost_image_path(instance, filename):
 
 
 class PostRoom(models.Model):
+    author = models.ForeignKey(
+        settings.base.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+    )
     broker = models.ForeignKey(
         'posts.Broker',
         on_delete=models.SET_NULL,
@@ -48,7 +50,7 @@ class PostRoom(models.Model):
         null=True,
     )
     type = models.CharField('매물 종류', max_length=10, null=True, )
-    description = models.TextField(max_length=500, verbose_name='설명', )
+    description = models.TextField(max_length=1000, verbose_name='설명', null=True, )
     address = models.ForeignKey(
         'posts.PostAddress',
         on_delete=models.CASCADE, null=True,
@@ -64,7 +66,7 @@ class PostRoom(models.Model):
     floor = models.CharField(null=True, verbose_name='층 수', max_length=5)
     totalFloor = models.CharField(null=True, verbose_name='건물 층 수', max_length=5)
     areaChar = models.CharField(verbose_name='문자형 전용 면적', max_length=20, null=True, )
-    supplyAreaInt = models.IntegerField(verbose_name='정수형 공급 면적', )
+    supplyAreaInt = models.IntegerField(verbose_name='정수형 공급 면적', null=True, )
     supplyAreaChar = models.CharField(verbose_name='문자형 공급 면적', max_length=10, null=True, )
     shortRent = models.NullBooleanField('단기임대', default=None, )
     management = models.ManyToManyField(
@@ -72,18 +74,18 @@ class PostRoom(models.Model):
         through='MaintenanceFee',
     )
 
-    parkingDetail = models.CharField(verbose_name='주차 비용', null=True, max_length=10)
-    parkingTF = models.NullBooleanField('주차 가능 유무', default=None)
-    parkingPay = models.FloatField('주차 비용', null=True, )
+    parkingDetail = models.CharField(verbose_name='주차 비용', null=True, max_length=10, blank=True, )
+    parkingTF = models.NullBooleanField('주차 가능 유무', default=None, null=True, )
+    parkingPay = models.FloatField('주차 비용', null=True, blank=True, )
 
     living_expenses = models.CharField('생활비', null=True, max_length=15, )
     living_expenses_detail = models.CharField('생활비 항목', null=True, max_length=20, )
 
     moveInChar = models.CharField('크롤링용 입주날짜', null=True, max_length=10)
-    moveInDate = models.DateTimeField(verbose_name='입주 가능 날짜', null=True, )
+    moveInDate = models.DateTimeField(verbose_name='입주 가능 날짜', null=True, blank=True, )
     #
     option = models.ManyToManyField('OptionItem', through='RoomOption', verbose_name='옵션 항목')
-    heatingType = models.CharField('난방 종류', max_length=10)
+    heatingType = models.CharField('난방 종류', max_length=10, null=True, )
 
     pet = models.NullBooleanField('반려동물', default=None)
     elevator = models.NullBooleanField('엘레베이터', default=None)
@@ -93,7 +95,7 @@ class PostRoom(models.Model):
     totalCitizen = models.CharField('총 세대 수', max_length=10, null=True, )
     totalPark = models.CharField('세대당 주차 대수', max_length=10, null=True, )
     complete = models.CharField('준공 년 월', max_length=10, null=True, )
-    #
+
     securitySafety = models.ManyToManyField(
         'posts.SecuritySafetyFacilities',
         through='RoomSecurity',
@@ -133,8 +135,8 @@ class SalesForm(models.Model):
 class MaintenanceFee(models.Model):
     postRoom = models.ForeignKey('posts.PostRoom', verbose_name='해당 매물', on_delete=models.CASCADE,
                                  related_name='management_set')
-    admin = models.ForeignKey('posts.AdministrativeDetail', verbose_name='포함 항목', on_delete=models.CASCADE, )
-    totalFee = models.FloatField(verbose_name='관리비 합계')
+    admin = models.ForeignKey('posts.AdministrativeDetail', verbose_name='포함 항목', on_delete=models.CASCADE, null=True, )
+    totalFee = models.FloatField(verbose_name='관리비 합계', null=True, )
 
 
 # 관리비 포함 항목
@@ -206,16 +208,6 @@ class PostImage(models.Model):
 
     def __str__(self):
         return '{}'.format(self.image)
-
-
-class UploadImage(models.Model):
-    content = models.CharField(max_length=1000)
-    image = ProcessedImageField(
-        upload_to=uploadpost_image_path,  # 저장 위치
-        # processors=[ResizeToFill(600, 600)],  # 처리할 작업 목록
-        format='JPEG',  # 저장 포맷(확장자)
-        options={'quality': 90},  # 저장 포맷 관련 옵션 (JPEG 압축률 설정)
-    )
 
 
 class ComplexInformation(models.Model):
