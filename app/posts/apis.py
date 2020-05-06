@@ -9,10 +9,11 @@ from rest_framework.exceptions import APIException
 from rest_framework.generics import RetrieveAPIView, get_object_or_404
 from rest_framework.parsers import FileUploadParser
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from posts.models import PostLike
 from posts.models import PostRoom, ComplexInformation
-from posts.serializers import PostLikeSerializer
+from posts.serializers import PostLikeSerializer, TestSerializer
 from posts.serializers import PostListSerializer, ComplexInformationSerializer
 
 secret = 'V8giduxGZ%2BU463maB552xw3jULhTVPrv%2B7m2qSqu4w8el9fk8bnMD9i6rjUQz7gcUcFnDKyOmcCBztcbVx3Ljg%3D%3D'
@@ -51,6 +52,13 @@ def ComplexDetail(request):
             'message': '존재하지 않는 단지 정보 입니다.'
         }
         return Response(data, status=status.HTTP_404_NOT_FOUND)
+
+
+class PostTestList(APIView):
+    def get(self, request):
+        queryset = PostRoom.objects.all()
+        serializer = TestSerializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 class PostList(generics.ListCreateAPIView):
