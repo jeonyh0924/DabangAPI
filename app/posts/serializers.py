@@ -72,6 +72,15 @@ class ComplexImageSerializer(serializers.ModelSerializer):
         field = 'image'
 
 
+class ComplexTinySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ComplexInformation
+        fields = [
+            'pk',
+            'complexName',
+        ]
+
+
 class ComplexInformationSerializer(serializers.ModelSerializer):
     image = serializers.StringRelatedField(source='compleximage_set', many=True, )
     list = serializers.SerializerMethodField()
@@ -200,7 +209,7 @@ class TestSerializer(serializers.ModelSerializer):
     address = AddressSerializer(read_only=True, allow_null=True)
     salesForm = SalesFormSerializer(read_only=True)
     postimage = serializers.StringRelatedField(source='postimage_set', many=True)
-    complex = ComplexInformationSerializer(read_only=True, )
+    complex = ComplexTinySerializer(read_only=True, )
 
     class Meta:
         model = PostRoom
