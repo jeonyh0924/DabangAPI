@@ -13,7 +13,7 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
 from posts.models import PostLike, Broker, PostAddress, SalesForm, MaintenanceFee, SecuritySafetyFacilities, PostImage, \
-    AdministrativeDetail
+    AdministrativeDetail, OptionItem, RoomOption, RoomSecurity
 from posts.models import PostRoom, ComplexInformation
 from posts.serializers import PostLikeSerializer, PostTinySerializer, BrokerSerializer, AddressSerializer, \
     SalesFormSerializer, ManagementSerializer, SecuritySafetySerializer, PostCreateSerializer
@@ -94,6 +94,12 @@ class PostTestAPIVie(APIView):
         managements = request.data.get('managements')
         managements = managements.split(',')
 
+        option = request.data.get('option')
+        option = option.split(',')
+
+        secusafe = request.data.get('secusafe')
+        secusafe = secusafe.split(',')
+
         post_ins = PostRoom.objects.create(
             broker=broker_ins,
             complex=complex_ins,
@@ -109,7 +115,17 @@ class PostTestAPIVie(APIView):
             manage_ins = AdministrativeDetail.objects.get(pk=mamagement_pk)
             MaintenanceFee.objects.create(admin=manage_ins, postRoom=post_ins)
 
-        serializer = PostCreateSerializer(post_ins)
+        if option:
+            for option_pk in option:
+                option_ins = get_object_or_404(OptionItem, pk=option_pk)
+                RoomOption.objects.create(postRoom=post_ins, option=option_ins)
+
+        if secusafe:
+            for ss_pk in secusafe:
+                ss_ins = get_object_or_404(SecuritySafetyFacilities, pk=ss_pk)
+                RoomSecurity.objects.create(postRoom=post_ins, security=ss_ins)
+
+        serializer = PostListSerializer(post_ins)
         # if serializer.is_valid():
         return Response(serializer.data, status=status.HTTP_201_CREATED)
         # return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
