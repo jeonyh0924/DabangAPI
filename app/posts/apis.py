@@ -102,14 +102,14 @@ class PostCreateAPIVie(APIView):
 
             # 이미지 relation  로직
             post_images = request.data.get('postimage')
-            POSTS_IMAGE_DIR = os.path.join(MEDIA_ROOT, f'.posts/postroom{post_pk}/')
-            if not os.path.exists(POSTS_IMAGE_DIR):
-                os.makedirs(POSTS_IMAGE_DIR, exist_ok=True)
+            POSTS_IMAGE_DIR = os.path.join(MEDIA_ROOT, f'.posts/postroom/')
+            # if not os.path.exists(POSTS_IMAGE_DIR):
+            #     os.makedirs(POSTS_IMAGE_DIR, exist_ok=True)
             for index, post_url in enumerate(post_images):
                 #
-                image_save_name = os.path.join(POSTS_IMAGE_DIR, f'{index}.jpg')
+                image_save_name = os.path.join(POSTS_IMAGE_DIR, f'{post_pk}_{index}.jpg')
                 urllib.request.urlretrieve(post_url, image_save_name)
-                f = open(os.path.join(POSTS_IMAGE_DIR, f'{index}.jpg'), 'rb')
+                f = open(os.path.join(POSTS_IMAGE_DIR, f'{post_pk}_{index}.jpg'), 'rb')
                 PostImage.objects.create(
                     image=File(f),
                     post=post
