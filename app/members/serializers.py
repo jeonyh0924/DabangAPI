@@ -33,6 +33,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         fields = [
             'pk',
             'phone',
+            'email',
             'profileImage',
             'posts',
             'brokers',

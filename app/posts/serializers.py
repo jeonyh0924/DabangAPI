@@ -257,6 +257,7 @@ class PostCreateSerializer(serializers.ModelSerializer):
     complex = ComplexInformationSerializer(read_only=True, )
     address = AddressSerializer(read_only=True, allow_null=True)
     salesForm = SalesFormSerializer(read_only=True, )
+    postimage = serializers.StringRelatedField(source='postimage_set', many=True, read_only=True, )
 
     class Meta:
         model = PostRoom
@@ -266,7 +267,29 @@ class PostCreateSerializer(serializers.ModelSerializer):
             'complex',
             'address',
             'salesForm',
-        ]
 
-    def __init__(self, *args, **kwargs):
-        super(PostCreateSerializer, self).__init__(*args, **kwargs)
+            'type',
+            'description',
+            'floor',
+            'totalFloor',
+            'areaChar',
+            'supplyAreaInt',
+            'supplyAreaChar',
+            'shortRent',
+            'parkingDetail',
+            'parkingTF',
+            'parkingPay',
+            'living_expenses',
+            'living_expenses_detail',
+            'moveInDate',
+            'heatingType',
+            'pet',
+            'elevator',
+            'builtIn',
+            'veranda',
+            'depositLoan',
+            'totalCitizen',
+            'totalPark',
+            'complete',
+            'postimage',
+        ]
