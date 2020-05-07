@@ -55,6 +55,7 @@ AWS_S3_REGION_NAME = 'ap-northeast-2'
 # Application definition
 
 INSTALLED_APPS = [
+    'presales.apps.PresalesConfig',
     'posts.apps.PostsConfig',
     'members.apps.MembersConfig',
 
