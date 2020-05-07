@@ -172,6 +172,14 @@ class PostLike(models.Model):
     )
 
 
+class ComplexLike(models.Model):
+    complexs = models.ForeignKey('posts.ComplexInformation', on_delete=models.CASCADE, )
+    user = models.ForeignKey(
+        settings.base.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+    )
+
+
 class RoomOption(models.Model):
     postRoom = models.ForeignKey('posts.PostRoom', verbose_name='해당 매물', on_delete=models.CASCADE,
                                  related_name='option_set')

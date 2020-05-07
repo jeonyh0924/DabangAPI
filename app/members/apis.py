@@ -13,10 +13,10 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_jwt.settings import api_settings
 
-from members.models import SocialLogin, RecentlyPostList, ContactToBroker
+from members.models import SocialLogin, RecentlyPostList, ContactToBroker, RecentlyComplexLis
 from members.permissions import IsProfileOwnerOrReadOnly
 from members.serializers import UserSerializer, UserProfileSerializer
-from posts.models import PostRoom, Broker
+from posts.models import PostRoom, Broker, ComplexInformation
 from posts.serializers import PostListSerializer
 
 User = get_user_model()
@@ -198,10 +198,32 @@ def getRecentlyPostListView(request):
         user=request.user,
         post=post,
     )
-    # social_user = RecentlyPostList.objects.filter(user=request.user.pk)
-    # print(social_user)
     data = {
         "message": f"{post} 번 방이 최근 유저 정보 리스트에 추가되었습니다."
+    }
+    return Response(data, status=status.HTTP_200_OK)
+
+
+@api_view()
+def getRecentlyComplexListView(request):
+    complex_pk = request.data.get('complex_ins')
+
+    copmlex_pk = int(complex_pk)
+    complex_ins = ComplexInformation.objects.get(pk=complex_pk)
+
+    if RecentlyComplexLis.objects.filter(user=request.user, complex_ins=complex_ins).exists():
+        data = {
+            'message': f"{complex_pk}번 단지는 이미 최신글 리스트에 존재하는 게시글 입니다."
+        }
+        return Response(
+            data, status=status.HTTP_400_BAD_REQUEST
+        )
+    RecentlyComplexLis.objects.get_or_create(
+        user=request.user,
+        complex_ins=complex_ins
+    )
+    data = {
+        "message": f"{complex_pk} 번 단지가 최근 유저 정보 리스트에 추가되었습니다."
     }
     return Response(data, status=status.HTTP_200_OK)
 

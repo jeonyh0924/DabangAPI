@@ -7,12 +7,14 @@ from posts.apis import getBorodCityList, getEupMyunDongList, getSiGunGuList, Bro
 urlpatterns_posts = [
     #  방 생성 uls
     path('create/', apis.PostCreateAPIVie.as_view()),
+
     # path('testDetail/<int:pk>/'),
     # 포스트 CRUD URLS
     path('tiny/', apis.PostTinytList.as_view()),
     # 포스트 서브 CRUD URLS
     path('broker/', BrokerAPIView.as_view()),
     path('postLike/', apis.PostLikeView.as_view()),
+    path('compLike/', apis.ComplexLikeView.as_view()),
 
     # 기타 URLS
     path('bjd/', apis.getAptListService),

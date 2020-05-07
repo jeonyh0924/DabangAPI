@@ -2,7 +2,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
 from members import views
-from members.apis import getRecentlyPostListView, getContactToBroker
+from members.apis import getRecentlyPostListView, getContactToBroker, getRecentlyComplexListView
 from . import apis
 
 # from members.apis import socialLogin
@@ -17,6 +17,7 @@ urlpatterns_members = [
     path('facebookToken/', apis.FacebookJwtToken.as_view()),
     path('kakao-login/', views.kakao_login),
     path('recently/', getRecentlyPostListView),
+    path('recentlyComplex/', getRecentlyComplexListView),
     path('contactTo/', getContactToBroker),
 
 ]

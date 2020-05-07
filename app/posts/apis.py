@@ -16,11 +16,12 @@ from rest_framework.viewsets import ModelViewSet
 
 from config.settings.base import MEDIA_ROOT
 from posts.models import PostLike, Broker, PostAddress, SalesForm, MaintenanceFee, SecuritySafetyFacilities, PostImage, \
-    AdministrativeDetail, OptionItem, RoomOption, RoomSecurity
+    AdministrativeDetail, OptionItem, RoomOption, RoomSecurity, ComplexLike
 from posts.models import PostRoom, ComplexInformation
 from posts.permissions import IsOwnerOrReadOnly
 from posts.serializers import PostLikeSerializer, PostTinySerializer, BrokerSerializer, AddressSerializer, \
-    SalesFormSerializer, ManagementSerializer, SecuritySafetySerializer, PostCreateSerializer
+    SalesFormSerializer, ManagementSerializer, SecuritySafetySerializer, PostCreateSerializer, PostTestSerializer, \
+    ComplexLikeSerializer
 from posts.serializers import PostListSerializer, ComplexInformationSerializer
 
 secret = 'V8giduxGZ%2BU463maB552xw3jULhTVPrv%2B7m2qSqu4w8el9fk8bnMD9i6rjUQz7gcUcFnDKyOmcCBztcbVx3Ljg%3D%3D'
@@ -70,7 +71,7 @@ class PostRoomViewSet(ModelViewSet):
 
     def get_serializer_class(self):
         if self.action in "create":
-            serializer_class = PostListSerializer
+            serializer_class = PostTestSerializer
             return serializer_class
 
         else:
@@ -83,38 +84,44 @@ class PostCreateAPIVie(APIView):
         serializer = PostCreateSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
+
             post_pk = serializer.data.get('pk')
             post = PostRoom.objects.get(pk=post_pk)
+
+            # author
+            post.author = request.user
             # broker
             broker_ins = Broker.objects.get(pk=1)
             post.broker = broker_ins
             # address
             loadAddress = request.data.get('loadAddress')
             detailAddress = request.data.get('detailAddress')
-            add_ins = PostAddress.objects.create(loadAddress=loadAddress, detailAddress=detailAddress)
+            add_ins, __ = PostAddress.objects.get_or_create(loadAddress=loadAddress, detailAddress=detailAddress)
             post.address = add_ins
 
             # complex
             compelx_ins = None
-            post.complex  = None
-
+            post.complex = None
+            post.save()
             # salesForm
 
             # 이미지 relation  로직
-            post_images = request.data.get('postimage')
-            POSTS_IMAGE_DIR = os.path.join(MEDIA_ROOT, f'.posts/postroom/')
-            # if not os.path.exists(POSTS_IMAGE_DIR):
-            #     os.makedirs(POSTS_IMAGE_DIR, exist_ok=True)
-            for index, post_url in enumerate(post_images):
-                #
-                image_save_name = os.path.join(POSTS_IMAGE_DIR, f'{post_pk}_{index}.jpg')
-                urllib.request.urlretrieve(post_url, image_save_name)
-                f = open(os.path.join(POSTS_IMAGE_DIR, f'{post_pk}_{index}.jpg'), 'rb')
-                PostImage.objects.create(
-                    image=File(f),
-                    post=post
-                )
-                f.close()
+
+            post_images = request.FILES
+            if post_images:
+                POSTS_IMAGE_DIR = os.path.join(MEDIA_ROOT, f'.posts/postroom/')
+                # if not os.path.exists(POSTS_IMAGE_DIR):
+                #     os.makedirs(POSTS_IMAGE_DIR, exist_ok=True)
+                for index, image_data in enumerate(post_images.getlist('image')):
+                    #
+                    image_save_name = os.path.join(POSTS_IMAGE_DIR, f'{post_pk}_{index}.jpg')
+                    # urllib.request.urlretrieve(post_url, image_save_name)
+                    # f = open(os.path.join(POSTS_IMAGE_DIR, f'{post_pk}_{index}.jpg'), 'rb')
+                    PostImage.objects.create(
+                        image=image_data,
+                        post=post
+                    )
+                    # f.close()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -241,4 +248,33 @@ class PostLikeView(RetrieveAPIView):
         post = get_object_or_404(PostRoom, pk=post_pk)
         post_like = get_object_or_404(PostLike, post=post, user=request.user)
         post_like.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class ComplexLikeView(RetrieveAPIView):
+    permission_classes = (
+        permissions.IsAuthenticated,
+    )
+
+    def post(self, request):
+        complex_pk = request.query_params.get('complex')
+        complexs = get_object_or_404(ComplexInformation, pk=complex_pk)
+        serializer = ComplexLikeSerializer(
+            data={'user': request.user.pk, 'complexs': complex_pk}
+        )
+        if serializer.is_valid():
+            if ComplexLike.objects.filter(
+                    complexs=serializer.validated_data['complexs'],
+                    user=request.user,
+            ).exists():
+                raise APIException('이미 좋아요 한 포스트 입니다.')
+            serializer.save(user=request.user, complexs=complexs)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request):
+        complex_pk = request.query_params.get('complex')
+        complexs = get_object_or_404(ComplexInformation, pk=complex_pk)
+        comp_like = get_object_or_404(ComplexLike, complexs=complexs, user=request.user)
+        comp_like.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
