@@ -66,6 +66,11 @@ class UserModelViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['POST'])
     def jwt(self, request):
         username = request.data.get('username')
+        if not User.objects.filter(username=username).exists():
+            data = {
+                'message': '정보가 올바르지 않습니다.'
+            }
+            return Response(data, status=status.HTTP_400_BAD_REQUEST)
         userpass = request.data.get('password')
         user = authenticate(username=username, password=userpass)
         payload = JWT_PAYLOAD_HANDLER(user)
@@ -76,6 +81,11 @@ class UserModelViewSet(viewsets.ModelViewSet):
                 'user': UserSerializer(user).data
             }
             return Response(data)
+        else:
+            data = {
+                'message': '정보가 올바르지 않습니다.'
+            }
+            return Response(data, status=status.HTTP_400_BAD_REQUEST)
 
 
 class KakaoJwtTokenView(APIView):
@@ -169,19 +179,17 @@ def getRecentlyPostListView(request):
         'message': "이미 최신글 리스트에 존재하는 게시글 입니다."
     }
     if dump:
-        # social_user = RecentlyPostList.objects.filter(user=request.user.pk)
-        # print(social_user)
         return Response(
             data, status=status.HTTP_400_BAD_REQUEST
         )
-    while True:
-        social_user = RecentlyPostList.objects.filter(user=request.user.pk)
-        user_post_count = len(social_user)
-
-        if user_post_count >= 5:
-            social_user[0].delete()
-        else:
-            break
+    # while True:
+    #     social_user = RecentlyPostList.objects.filter(user=request.user.pk)
+    #     user_post_count = len(social_user)
+    #
+    #     if user_post_count >= 5:
+    #         social_user[0].delete()
+    #     else:
+    #         break
     RecentlyPostList.objects.get_or_create(
         user=request.user,
         post=post,

@@ -37,6 +37,7 @@ class PostRoom(models.Model):
     author = models.ForeignKey(
         settings.base.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
+        null=True,
     )
     broker = models.ForeignKey(
         'posts.Broker',

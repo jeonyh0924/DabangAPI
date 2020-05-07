@@ -25,7 +25,7 @@ router.register('address', apis.AddressViewSet)
 router.register('salesForm', apis.SalesFormViewSet)
 router.register('maintenance', apis.MaintenanceFeeViewSet)
 router.register('ss', apis.SecuritySafetyViewSet)
-router.register('post', apis.PostRoomViewSet)
+router.register('', apis.PostRoomViewSet)
 urlpatterns_posts += [
     path('', include(router.urls))
 ]
