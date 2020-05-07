@@ -6,7 +6,7 @@ from posts.apis import getBorodCityList, getEupMyunDongList, getSiGunGuList, Bro
 
 urlpatterns_posts = [
     #  방 생성 uls
-    path('test/', apis.PostTestAPIVie.as_view()),
+    path('create/', apis.PostCreateAPIVie.as_view()),
     # path('testDetail/<int:pk>/'),
     # 포스트 CRUD URLS
     path('tiny/', apis.PostTinytList.as_view()),

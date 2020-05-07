@@ -78,13 +78,27 @@ class PostRoomViewSet(ModelViewSet):
             return serializer_class
 
 
-class PostTestAPIVie(APIView):
+class PostCreateAPIVie(APIView):
     def post(self, request):
         serializer = PostCreateSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             post_pk = serializer.data.get('pk')
             post = PostRoom.objects.get(pk=post_pk)
+            # broker
+            broker_ins = Broker.objects.get(pk=1)
+            post.broker = broker_ins
+            # address
+            loadAddress = request.data.get('loadAddress')
+            detailAddress = request.data.get('detailAddress')
+            add_ins = PostAddress.objects.create(loadAddress=loadAddress, detailAddress=detailAddress)
+            post.address = add_ins
+
+            # complex
+            compelx_ins = None
+            post.complex  = None
+
+            # salesForm
 
             # 이미지 relation  로직
             post_images = request.data.get('postimage')
