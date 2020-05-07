@@ -14,6 +14,7 @@ from rest_framework.views import APIView
 from rest_framework_jwt.settings import api_settings
 
 from members.models import SocialLogin, RecentlyPostList, ContactToBroker
+from members.permissions import IsProfileOwnerOrReadOnly
 from members.serializers import UserSerializer, UserProfileSerializer
 from posts.models import PostRoom, Broker
 from posts.serializers import PostListSerializer
@@ -52,7 +53,10 @@ class UserModelViewSet(viewsets.ModelViewSet):
             return serializer_class
 
     def get_permissions(self):
-        if self.action == ("retrieve", "partial_update", "update", "destroy"):
+        if self.action == ("partial_update", "update", "destroy"):
+            permission_classes = [IsProfileOwnerOrReadOnly()]
+            return permission_classes
+        elif self.action == ("retrieve", "partial_update", "update", "destroy"):
             permission_classes = [IsAuthenticated()]
             return permission_classes
         elif self.action == "list":
@@ -176,7 +180,7 @@ def getRecentlyPostListView(request):
     post = PostRoom.objects.get(pk=post)
     dump = RecentlyPostList.objects.filter(user=request.user, post=post)
     data = {
-        'message': "이미 최신글 리스트에 존재하는 게시글 입니다."
+        'message': f"{post}번 방은 이미 최신글 리스트에 존재하는 게시글 입니다."
     }
     if dump:
         return Response(
@@ -197,7 +201,7 @@ def getRecentlyPostListView(request):
     # social_user = RecentlyPostList.objects.filter(user=request.user.pk)
     # print(social_user)
     data = {
-        "message": "최근 유저 정보 리스트에 추가되었습니다."
+        "message": f"{post} 번 방이 최근 유저 정보 리스트에 추가되었습니다."
     }
     return Response(data, status=status.HTTP_200_OK)
 
