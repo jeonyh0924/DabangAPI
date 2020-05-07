@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import PostRoom, PostImage, Broker, MaintenanceFee, RoomOption, PostAddress, RoomSecurity, SalesForm, \
-    OptionItem, SecuritySafetyFacilities, ComplexInformation, ComplexImage, RecommendComplex, PostLike
+    OptionItem, SecuritySafetyFacilities, ComplexInformation, ComplexImage, RecommendComplex, PostLike, ComplexLike
 
 
 class BrokerSerializer(serializers.ModelSerializer):
@@ -216,6 +216,15 @@ class PostLikeSerializer(serializers.ModelSerializer):
         ]
 
 
+class ComplexLikeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ComplexLike
+        fields = [
+            'complexs',
+            'user',
+        ]
+
+
 class PostLikeUserSerializer(serializers.ModelSerializer):
     post = PostListSerializer()
 
@@ -223,6 +232,16 @@ class PostLikeUserSerializer(serializers.ModelSerializer):
         model = PostLike
         fields = [
             'post',
+        ]
+
+
+class ComplexLikeUserSerializer(serializers.ModelSerializer):
+    complexs = ComplexInformationSerializer()
+
+    class Meta:
+        model = ComplexLike
+        fields = [
+            'complexs',
         ]
 
 
@@ -253,9 +272,7 @@ class PostTinySerializer(serializers.ModelSerializer):
 
 
 class PostCreateSerializer(serializers.ModelSerializer):
-    broker = BrokerSerializer(read_only=True, )
     complex = ComplexInformationSerializer(read_only=True, )
-    address = AddressSerializer(read_only=True, allow_null=True)
     salesForm = SalesFormSerializer(read_only=True, )
     postimage = serializers.StringRelatedField(source='postimage_set', many=True, read_only=True, )
 
@@ -263,13 +280,12 @@ class PostCreateSerializer(serializers.ModelSerializer):
         model = PostRoom
         fields = [
             'pk',
-            'broker',
             'complex',
-            'address',
             'salesForm',
-
             'type',
             'description',
+            'lat',
+            'lng',
             'floor',
             'totalFloor',
             'areaChar',
@@ -293,3 +309,18 @@ class PostCreateSerializer(serializers.ModelSerializer):
             'complete',
             'postimage',
         ]
+
+
+class PostTestSerializer(serializers.ModelSerializer):
+    images = PostImageSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = PostRoom
+        fields = ['pk', 'type', 'images']
+
+    def create(self, validated_data):
+        images_data = self.context['request'].FILES
+        post = PostRoom.objects.create(**validated_data)
+        for image_data in images_data.getlist('image'):
+            PostImage.objects.create(post=post, image=image_data)
+        return post
