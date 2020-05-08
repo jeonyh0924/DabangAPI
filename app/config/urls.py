@@ -22,6 +22,7 @@ from config import settings
 from members import views
 from members.urls import urlpatterns_members
 from posts.urls import urlpatterns_posts
+from presales.urls import urlpatterns_presales
 
 urlpatterns = [
     # path('auth/', include('rest_framework_social_oauth2.urls')), # rest_framework_social_oauth2
@@ -33,6 +34,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('members/', include(urlpatterns_members)),
     path('posts/', include(urlpatterns_posts)),
+    path('presales/', include(urlpatterns_presales)),
     path('login/', views.login_page, name='login-page'),  # kakao access token 받기 위한 template
 ]
 
