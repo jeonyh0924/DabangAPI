@@ -53,11 +53,11 @@ class PreSaleSerializer(serializers.ModelSerializer):
 
 class PreSaleTinySerializer(serializers.ModelSerializer):
     image = PreSaleImageSerializer(source='presaleimage_set', many=True, )
-    list = serializers.SerializerMethodField()
 
     class Meta:
         model = PreSale
         fields = [
+            'id',
             'status',
             'detail_type',
             'supply_type',

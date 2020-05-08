@@ -53,7 +53,6 @@ AWS_AUTO_CREATE_BUCKET = True
 AWS_S3_REGION_NAME = 'ap-northeast-2'
 
 # Application definition
-
 INSTALLED_APPS = [
     'presales.apps.PresalesConfig',
     'posts.apps.PostsConfig',
@@ -119,6 +118,9 @@ JWT_AUTH = {
 ROOT_URLCONF = 'config.urls'
 
 REST_FRAMEWORK = {
+    # djagno filter
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
+
     'DEFAULT_AUTHENTICATION_CLASSES': (
         #  소셜로그인이 아닌 인증방식에선 해당 authencation 필요
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',

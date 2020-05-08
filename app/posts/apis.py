@@ -14,7 +14,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
-from config.settings.base import MEDIA_ROOT
+from config.settings.base import MEDIA_ROOT, AUTH_USER_MODEL
+from members.models import User
 from posts.models import PostLike, Broker, PostAddress, SalesForm, MaintenanceFee, SecuritySafetyFacilities, PostImage, \
     AdministrativeDetail, OptionItem, RoomOption, RoomSecurity, ComplexLike
 from posts.models import PostRoom, ComplexInformation
@@ -25,6 +26,8 @@ from posts.serializers import PostLikeSerializer, PostTinySerializer, BrokerSeri
 from posts.serializers import PostListSerializer, ComplexInformationSerializer
 
 secret = 'V8giduxGZ%2BU463maB552xw3jULhTVPrv%2B7m2qSqu4w8el9fk8bnMD9i6rjUQz7gcUcFnDKyOmcCBztcbVx3Ljg%3D%3D'
+
+
 
 
 class BrokerAPIView(APIView):
@@ -89,7 +92,8 @@ class PostCreateAPIVie(APIView):
             post = PostRoom.objects.get(pk=post_pk)
 
             # author
-            post.author = request.user
+            user = User.objects.get(pk=1)
+            post.author = user
             # broker
             broker_ins = Broker.objects.get(pk=1)
             post.broker = broker_ins
