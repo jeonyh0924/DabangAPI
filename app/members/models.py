@@ -35,6 +35,7 @@ class User(AbstractUser):
     )
 
 
+
 class SocialLogin(models.Model):
     type = models.CharField(max_length=10, )
 

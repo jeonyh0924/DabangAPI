@@ -37,8 +37,10 @@ class UserProfileSerializer(serializers.ModelSerializer):
         model = User
         fields = [
             'pk',
-            'phone',
             'email',
+            'username',
+            'phone',
+            
             'profileImage',
             'posts',
             'complexs',
