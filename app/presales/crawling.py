@@ -14,8 +14,9 @@ from presales.models import PreSale, PreSaleImage, Thema, Brand
 def presaleCrawling():
     driver = webdriver.Chrome('/Users/mac/projects/ChromeWebDriver/chromedriver')
     presaleMainList = [
-        #     'https://www.dabangapp.com/sales-in-lots#/theme',
-        'https://www.dabangapp.com/sales-in-lots#/brand']
+            'https://www.dabangapp.com/sales-in-lots#/theme',
+        # 'https://www.dabangapp.com/sales-in-lots#/brand'
+    ]
 
     for main_url in presaleMainList:
         driver.get(main_url)
@@ -461,7 +462,7 @@ def presaleCrawling():
 
                         for index, image in enumerate(preSalesImageList):
                             try:
-                                PRESALE_IMAGE_DIR = os.path.join(MEDIA_ROOT, f'.posts/complex{pre_ins.pk}/')
+                                PRESALE_IMAGE_DIR = os.path.join(MEDIA_ROOT, f'.posts/presale{pre_ins.pk}/')
                                 if not os.path.exists(PRESALE_IMAGE_DIR):
                                     os.makedirs(PRESALE_IMAGE_DIR, exist_ok=True)
 
