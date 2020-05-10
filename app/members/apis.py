@@ -2,6 +2,7 @@ import json
 
 import requests
 from django.contrib.auth import get_user_model, authenticate
+
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 from rest_framework import viewsets, status
@@ -69,22 +70,23 @@ class UserModelViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['POST'])
     def jwt(self, request):
-        username = request.data.get('username')
-        if not User.objects.filter(username=username).exists():
+        email = request.data.get('email')
+        if not User.objects.filter(email=email).exists():
             data = {
-                'message': '정보가 올바르지 않습니다.'
+                'message': ' 유저의 이메일 정보가 올바르지 않습니다.'
             }
             return Response(data, status=status.HTTP_400_BAD_REQUEST)
-        userpass = request.data.get('password')
-        user = authenticate(username=username, password=userpass)
-        payload = JWT_PAYLOAD_HANDLER(user)
-        jwt_token = JWT_ENCODE_HANDLER(payload)
-        if user is not None:
+        password = request.data.get('password')
+        user = User.objects.get(email=email)
+        if user.check_password(password):
+            payload = JWT_PAYLOAD_HANDLER(user)
+            jwt_token = JWT_ENCODE_HANDLER(payload)
+        # user = authenticate(username=username, password=userpass)
             data = {
                 'token': jwt_token,
                 'user': UserSerializer(user).data
             }
-            return Response(data)
+            return Response(data, status=status.HTTP_200_OK)
         else:
             data = {
                 'message': '정보가 올바르지 않습니다.'

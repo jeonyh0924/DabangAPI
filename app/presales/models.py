@@ -68,10 +68,11 @@ class PreSale(models.Model):
 
 class PreSaleImage(models.Model):
     presale = models.ForeignKey(
-        PreSale,
+        'presales.PreSale',
         on_delete=models.CASCADE,
     )
     image = models.ImageField(
+        '분양 이미지',
         upload_to=presales_image_path,
         null=True,
     )

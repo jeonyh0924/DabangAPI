@@ -52,7 +52,7 @@ class PreSaleSerializer(serializers.ModelSerializer):
 
 
 class PreSaleTinySerializer(serializers.ModelSerializer):
-    image = PreSaleImageSerializer(source='presaleimage_set', many=True, )
+    image = serializers.StringRelatedField(source='presaleimage_set', many=True, )
 
     class Meta:
         model = PreSale
