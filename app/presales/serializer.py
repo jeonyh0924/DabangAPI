@@ -24,7 +24,7 @@ class PreSaleImageSerializer(serializers.ModelSerializer):
 class PreSaleSerializer(serializers.ModelSerializer):
     brand = BrandSerialzier()
     thema = ThemaSerialzier()
-    image = PreSaleImageSerializer(source='presaleimage_set', many=True, )
+    image = serializers.StringRelatedField(source='presaleimage_set', many=True, )
     list = serializers.SerializerMethodField()
 
     class Meta:

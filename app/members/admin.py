@@ -5,7 +5,7 @@ from members.models import User, RecentlyPostList, ContactToBroker
 
 
 class UserAdmin(admin.ModelAdmin):
-    search_fields = ('id', 'username',)
+    list_display = ['pk', 'username', 'email']
 
 
 class RecentlyPostListAdmin(admin.ModelAdmin):
