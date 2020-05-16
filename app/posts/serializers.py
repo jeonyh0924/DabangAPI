@@ -3,15 +3,6 @@ from .models import PostRoom, PostImage, Broker, MaintenanceFee, RoomOption, Pos
     OptionItem, SecuritySafetyFacilities, ComplexInformation, ComplexImage, RecommendComplex, PostLike, ComplexLike
 
 
-class BrokerSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Broker
-        fields = (
-            'pk', 'companyName', 'address', 'managerName', 'tel', 'image', 'companyNumber', 'brokerage',
-            'dabangCreated_at', 'successCount'
-        )
-
-
 class ManagementSerializer(serializers.ModelSerializer):
     class Meta:
         model = MaintenanceFee
@@ -150,6 +141,17 @@ class ComplexInformationSerializer(serializers.ModelSerializer):
         return complex_ins
 
 
+class BrokerSerializer(serializers.ModelSerializer):
+    pkList = serializers.PrimaryKeyRelatedField(many=True, read_only=True, source='postroom_set')
+
+    class Meta:
+        model = Broker
+        fields = (
+            'pk', 'companyName', 'address', 'managerName', 'tel', 'image', 'companyNumber', 'brokerage',
+            'dabangCreated_at', 'successCount', 'pkList'
+        )
+
+
 class PostListSerializer(serializers.ModelSerializer):
     broker = BrokerSerializer(read_only=True, )
     management_set = serializers.StringRelatedField(source='management', many=True, read_only=True)
@@ -250,12 +252,15 @@ class PostTinySerializer(serializers.ModelSerializer):
     salesForm = SalesFormSerializer(read_only=True)
     postimage = serializers.StringRelatedField(source='postimage_set', many=True)
     complex = ComplexTinySerializer(read_only=True, )
+    optionSet = serializers.StringRelatedField(source='option', many=True, read_only=True)
 
     class Meta:
         model = PostRoom
         fields = [
             'pk',
             'type',
+            'name',
+            'supplyAreaInt',
             'description',
             'address',
             'lng',
@@ -266,7 +271,11 @@ class PostTinySerializer(serializers.ModelSerializer):
             'veranda',
             'depositLoan',
             'postimage',
-            'complex'
+            'complex',
+            'areaChar',
+            'floor',
+            'optionSet',
+
 
         ]
 
@@ -297,6 +306,7 @@ class PostCreateSerializer(serializers.ModelSerializer):
             'parkingPay',
             'living_expenses',
             'living_expenses_detail',
+            'moveInChar',
             'moveInDate',
             'heatingType',
             'pet',

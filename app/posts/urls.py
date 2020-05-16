@@ -2,13 +2,12 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
 from posts import apis
-from posts.apis import getBorodCityList, getEupMyunDongList, getSiGunGuList, BrokerAPIView
+from posts.apis import getBorodCityList, getEupMyunDongList, getSiGunGuList, BrokerAPIView, PostDivisionFilter
 
 urlpatterns_posts = [
     #  방 생성 uls
     path('create/', apis.PostCreateAPIVie.as_view()),
 
-    # path('testDetail/<int:pk>/'),
     # 포스트 CRUD URLS
     path('tiny/', apis.PostTinytList.as_view()),
     # 포스트 서브 CRUD URLS
@@ -21,6 +20,10 @@ urlpatterns_posts = [
     path('bc/', getBorodCityList),
     path('sg/', getSiGunGuList),
     path('emd/', getEupMyunDongList),
+
+    # 방 위도 경도 필터링
+    path('distance/', PostDivisionFilter),
+
 ]
 
 router = DefaultRouter()

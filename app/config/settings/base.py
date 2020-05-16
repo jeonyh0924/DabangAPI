@@ -154,7 +154,6 @@ TEMPLATES = [
 
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',  # <- 디폴트 모델 백엔드
-    # 'members.backends.EmailBackend',
 )
 
 # Password validation
