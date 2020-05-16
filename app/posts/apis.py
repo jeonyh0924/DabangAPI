@@ -1,23 +1,24 @@
 import json
 import os
-import urllib
-from django.core.files import File
+
 import requests
 import xmltodict
-from django.http import Http404
+from django.db.models import Q
+
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status, generics, permissions
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import APIException
 from rest_framework.generics import RetrieveAPIView, get_object_or_404
-from rest_framework.parsers import FileUploadParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
-from config.settings.base import MEDIA_ROOT, AUTH_USER_MODEL
+from config.settings.base import MEDIA_ROOT
 from members.models import User
+from posts.filters import PostFilter
 from posts.models import PostLike, Broker, PostAddress, SalesForm, MaintenanceFee, SecuritySafetyFacilities, PostImage, \
-    AdministrativeDetail, OptionItem, RoomOption, RoomSecurity, ComplexLike
+    ComplexLike, OptionItem
 from posts.models import PostRoom, ComplexInformation
 from posts.permissions import IsOwnerOrReadOnly
 from posts.serializers import PostLikeSerializer, PostTinySerializer, BrokerSerializer, AddressSerializer, \
@@ -26,8 +27,6 @@ from posts.serializers import PostLikeSerializer, PostTinySerializer, BrokerSeri
 from posts.serializers import PostListSerializer, ComplexInformationSerializer
 
 secret = 'V8giduxGZ%2BU463maB552xw3jULhTVPrv%2B7m2qSqu4w8el9fk8bnMD9i6rjUQz7gcUcFnDKyOmcCBztcbVx3Ljg%3D%3D'
-
-
 
 
 class BrokerAPIView(APIView):
@@ -71,12 +70,18 @@ class SecuritySafetyViewSet(ModelViewSet):
 
 class PostRoomViewSet(ModelViewSet):
     queryset = PostRoom.objects.all()
+    filter_backends = [DjangoFilterBackend]
+    filter_class = PostFilter
+    filterset_fields = ['supplyAreaInt', 'complete']
+    search_fields = ['supplyAreaInt', 'complete']
 
     def get_serializer_class(self):
         if self.action in "create":
             serializer_class = PostTestSerializer
             return serializer_class
-
+        if self.action in "list":
+            serializer_class = PostTinySerializer
+            return serializer_class
         else:
             serializer_class = PostListSerializer
             return serializer_class
@@ -86,7 +91,22 @@ class PostCreateAPIVie(APIView):
     def post(self, request):
         serializer = PostCreateSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            # salesForm
+            salesForm_type = request.data.get('salesFormType')
+            salesForm_depositChar = request.data.get('depositChar')
+            salesForm_monthlyChar = request.data.get('monthlyChar')
+            salesForm_depositInt = request.data.get('depositInt')
+            salesForm_monthlyInt = request.data.get('monthlyInt')
+
+            salesform_ins = SalesForm.objects.create(
+                type=salesForm_type,
+                depositChar=salesForm_depositChar,
+                monthlyChar=salesForm_monthlyChar,
+                depositInt=salesForm_depositInt,
+                monthlyInt=salesForm_monthlyInt,
+            )
+
+            serializer.save(salesForm=salesform_ins)
 
             post_pk = serializer.data.get('pk')
             post = PostRoom.objects.get(pk=post_pk)
@@ -106,11 +126,26 @@ class PostCreateAPIVie(APIView):
             # complex
             compelx_ins = None
             post.complex = None
+
+            # options
+            options = request.data.get('options')
+            if options:
+                options = options.split(',')
+                for option in options:
+                    option_ins = OptionItem.objects.get(name=option)
+                    post.option.add(option_ins)
+
+            # security safety
+            security_safetys = request.data.get('security_safetys')
+            if security_safetys:
+                security_safetys = security_safetys.split(',')
+                for ss in security_safetys:
+                    ss_ins = SecuritySafetyFacilities.objects.get(name=ss)
+                    post.securitySafety.add(ss_ins)
+
             post.save()
-            # salesForm
 
             # 이미지 relation  로직
-
             post_images = request.FILES
             if post_images:
                 POSTS_IMAGE_DIR = os.path.join(MEDIA_ROOT, f'.posts/postroom/')
@@ -126,7 +161,7 @@ class PostCreateAPIVie(APIView):
                         post=post
                     )
                     # f.close()
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -282,3 +317,33 @@ class ComplexLikeView(RetrieveAPIView):
         comp_like = get_object_or_404(ComplexLike, complexs=complexs, user=request.user)
         comp_like.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@api_view()
+def PostDivisionFilter(request):
+    """
+    orm : https://brownbears.tistory.com/63, https://stackoverflow.com/questions/769843/how-do-i-use-and-in-a-django-filter
+
+    """
+    variable_for_lat = 0.0083
+    variable_for_lng = 0.009197
+
+    request_lng = request.query_params.get('reqLat')
+    request_lat = request.query_params.get('reqLng')
+
+    request_lng = float(request_lng)
+    request_lat = float(request_lat)
+    distance = request.query_params.get('distance')
+    distance = float(distance)
+
+    boundary = {
+        "max_lat": request_lng + variable_for_lng * distance,
+        "min_lat": request_lng - variable_for_lng * distance,
+        "max_lng": request_lat + variable_for_lat * distance,
+        "min_lng": request_lat - variable_for_lat * distance,
+    }
+
+    post = PostRoom.objects.filter(lng__gte=boundary['min_lng'], lng__lte=boundary['max_lng']) \
+        .filter(lat__gte=boundary['min_lat'], lat__lte=boundary['max_lat'])
+    serializer = PostTinySerializer(post, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
