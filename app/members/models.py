@@ -35,7 +35,6 @@ class User(AbstractUser):
     )
 
 
-
 class SocialLogin(models.Model):
     type = models.CharField(max_length=10, )
 
@@ -49,7 +48,7 @@ class SocialLogin(models.Model):
     def start():
         socials = ['kakao', 'facebook', 'apple']
         for i in socials:
-            SocialLogin.objects.create(
+            SocialLogin.objects.get_or_create(
                 type=i,
             )
 

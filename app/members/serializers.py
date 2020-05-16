@@ -15,6 +15,7 @@ class UserSerializer(serializers.ModelSerializer):
             'pk',
             'email',
             'password',
+            'username',
         ]
         extra_kwargs = {'password': {'write_only': True}}
 
@@ -38,7 +39,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
             'email',
             'username',
             'phone',
-            
+
             'profileImage',
             'posts',
             'complexs',
@@ -47,4 +48,59 @@ class UserProfileSerializer(serializers.ModelSerializer):
             'compLike',
             'write_post',
 
+        ]
+
+
+class UserPostLikePostSerializer(serializers.ModelSerializer):
+    postLike = PostLikeUserSerializer(source='postlike_set', many=True, read_only=True, )
+
+    class Meta:
+        model = User
+        fields = [
+            'pk',
+            'postLike'
+        ]
+
+
+class UserPostSerializer(serializers.ModelSerializer):
+    posts = PostListSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = User
+        fields = [
+            'pk',
+            'posts',
+        ]
+
+
+class UserComplexsSerializer(serializers.ModelSerializer):
+    complexs = ComplexInformationSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = User
+        fields = [
+            'pk',
+            'complexs',
+        ]
+
+
+class UserComplexLikeSerializer(serializers.ModelSerializer):
+    compLike = ComplexLikeUserSerializer(source='complexlike_set', many=True, read_only=True, )
+
+    class Meta:
+        model = User
+        fields = [
+            'pk',
+            'compLike',
+        ]
+
+
+class UserBrokerSerializer(serializers.ModelSerializer):
+    brokers = BrokerSerializer(many=True, read_only=True, )
+
+    class Meta:
+        model = User
+        fields = [
+            'pk',
+            'brokers',
         ]
