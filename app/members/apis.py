@@ -1,10 +1,10 @@
 import json
 
 import requests
-from django.contrib.auth import get_user_model, authenticate
+from django.contrib.auth import get_user_model
 
 from django.contrib.auth.models import User
-from django.http import HttpResponse
+
 from rest_framework import viewsets, status
 from rest_framework.decorators import action, api_view
 
@@ -16,9 +16,10 @@ from rest_framework_jwt.settings import api_settings
 
 from members.models import SocialLogin, RecentlyPostList, ContactToBroker, RecentlyComplexLis
 from members.permissions import IsProfileOwnerOrReadOnly
-from members.serializers import UserSerializer, UserProfileSerializer
+from members.serializers import UserSerializer, UserProfileSerializer, UserPostLikePostSerializer, UserPostSerializer, \
+    UserComplexsSerializer, UserComplexLikeSerializer, UserBrokerSerializer
 from posts.models import PostRoom, Broker, ComplexInformation
-from posts.serializers import PostListSerializer
+from posts.serializers import PostTinySerializer, PostListSerializer
 
 User = get_user_model()
 JWT_PAYLOAD_HANDLER = api_settings.JWT_PAYLOAD_HANDLER
@@ -81,7 +82,7 @@ class UserModelViewSet(viewsets.ModelViewSet):
         if user.check_password(password):
             payload = JWT_PAYLOAD_HANDLER(user)
             jwt_token = JWT_ENCODE_HANDLER(payload)
-        # user = authenticate(username=username, password=userpass)
+            # user = authenticate(username=username, password=userpass)
             data = {
                 'token': jwt_token,
                 'user': UserSerializer(user).data
@@ -92,6 +93,43 @@ class UserModelViewSet(viewsets.ModelViewSet):
                 'message': '정보가 올바르지 않습니다.'
             }
             return Response(data, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=['GET'])
+    def postlike(self, request):
+        user = request.user
+        serializer = UserPostLikePostSerializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['GET'])
+    def recentlyPosts(self, request):
+        user = request.user
+        serializer = UserPostSerializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['GET'])
+    def complexs(self, request):
+        user = request.user
+        serializer = UserComplexsSerializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['GET'])
+    def complike(self, request):
+        user = request.user
+        serializer = UserComplexLikeSerializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['GET'])
+    def brokers(self, request):
+        user = request.user
+        serializer = UserBrokerSerializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['GET'])
+    def posts(self, request):
+        user = request.user
+        posts = user.postroom_set.all()
+        serializer = PostListSerializer(posts, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class KakaoJwtTokenView(APIView):
@@ -114,9 +152,7 @@ class KakaoJwtTokenView(APIView):
         except User.DoesNotExist:
             user = User.objects.create_user(
                 username=kakao_id,
-                first_name=user_first_name,
-                last_name=user_last_name,
-
+                email=f'{kakao_id}@daum.net'
             )
         payload = JWT_PAYLOAD_HANDLER(user)
         jwt_token = JWT_ENCODE_HANDLER(payload)
@@ -160,8 +196,7 @@ class FacebookJwtToken(APIView):
         except User.DoesNotExist:
             user = User.objects.create_user(
                 username=facebook_id,
-                first_name=first_name,
-                last_name=last_name,
+                email=f'{facebook_id}@facebook.com'
             )
         payload = JWT_PAYLOAD_HANDLER(user)
         jwt_token = JWT_ENCODE_HANDLER(payload)
@@ -262,3 +297,30 @@ def getContactToBroker(request):
     user_list = ContactToBroker.objects.filter(user=request.user.pk)
     print(user_list)
     return Response(data, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+def AppleSocialLogin(request):
+    email = request.data.get('email')
+    username = request.data.get('username')
+    social = request.data.get('social')
+    if not social:
+        data = {
+            'message': '소셜 타입을 명시하세요.'
+        }
+        return Response(data, status=status.HTTP_400_BAD_REQUEST)
+    if social == 'apple':
+        apple_ins = SocialLogin.objects.get(type=social)
+        user, __ = User.objects.get_or_create(email=email, username=username)
+        user.social.add(apple_ins)
+        payload = JWT_PAYLOAD_HANDLER(user)
+        jwt_token = JWT_ENCODE_HANDLER(payload)
+        data = {
+            'token': jwt_token,
+            'user': UserSerializer(user).data
+        }
+        return Response(data, status=status.HTTP_200_OK)
+    data = {
+        'message': 'apple 로그인을 위한 요청 주소입니다.'
+    }
+    return Response(data, status=status.HTTP_400_BAD_REQUEST)
