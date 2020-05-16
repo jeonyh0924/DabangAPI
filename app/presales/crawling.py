@@ -43,7 +43,7 @@ def presaleCrawling():
                     driver.execute_script("arguments[0].click();", button)
                     time.sleep(1)
 
-                    brand = None
+                    brand = ''
                     table_rows = driver.find_elements_by_xpath(
                         '/html/body/div[1]/div/div[2]/div/div/div[2]/table/tbody/tr')
                     for row_index, rows in enumerate(range(len(table_rows))):
@@ -87,12 +87,12 @@ def presaleCrawling():
                         sales_citizen = driver.find_element_by_xpath(
                             '/html/body/div[1]/div/div/div[1]/div/ul/li[2]/p[2]')
                         sales_citizen = sales_citizen.get_attribute('innerText')
-                        print('sales_citizen >>>> ', sales_citizen)
+                        print('salesCitizen >>>> ', sales_citizen)
 
                         min_max_floor = driver.find_element_by_xpath(
                             '/html/body/div[1]/div/div/div[1]/div/ul/li[3]/p[2]')
                         min_max_floor = min_max_floor.get_attribute('innerText')
-                        print('min_max_floor >>> ', min_max_floor)
+                        print('minMaxFloor >>> ', min_max_floor)
 
                         complex_scale = driver.find_element_by_xpath(
                             '/html/body/div[1]/div/div/div[1]/div/ul/li[4]/p[2]')
@@ -104,7 +104,7 @@ def presaleCrawling():
                         detail_type = driver.find_element_by_xpath(
                             '/html/body/div[1]/div/div/div[3]/div/table/tbody/tr[1]/td[1]')
                         detail_type = detail_type.get_attribute('innerText')
-                        print('detail_type >>> ', detail_type)
+                        print('detailType >>> ', detail_type)
 
                         constraint = driver.find_element_by_xpath(
                             '/html/body/div[1]/div/div/div[3]/div/table/tbody/tr[2]/td[1]')
@@ -119,7 +119,7 @@ def presaleCrawling():
                         supply_type = driver.find_element_by_xpath(
                             '/html/body/div[1]/div/div/div[3]/div/table/tbody/tr[1]/td[2]')
                         supply_type = supply_type.get_attribute('innerText')
-                        print('supply_type >>', supply_type)
+                        print('supplyType >>', supply_type)
 
                         constraint_area = driver.find_element_by_xpath(
                             '/html/body/div[1]/div/div/div[3]/div/table/tbody/tr[2]/td[2]')
@@ -139,7 +139,7 @@ def presaleCrawling():
                         max_price = driver.find_element_by_xpath(
                             '/html/body/div[1]/div/div/div[3]/div/table/tbody/tr[2]/td[3]')
                         max_price = max_price.get_attribute('innerText')
-                        print('max_price >>> ', max_price)
+                        print('maxPrice >>> ', max_price)
 
                         moveIn = driver.find_element_by_xpath(
                             '/html/body/div[1]/div/div/div[3]/div/table/tbody/tr[3]/td[3]')
@@ -154,7 +154,7 @@ def presaleCrawling():
                         constraint_term = driver.find_element_by_xpath(
                             '/html/body/div[1]/div/div/div[3]/div/table/tbody/tr[2]/td[4]')
                         constraint_term = constraint_term.get_attribute('innerText')
-                        print('constraint_term >>>', constraint_term)
+                        print('constraintTerm >>>', constraint_term)
 
                         div_list = driver.find_elements_by_xpath('/html/body/div[1]/div/div/div[4]/div/div/div')
 
@@ -164,17 +164,17 @@ def presaleCrawling():
                             detail_price = driver.find_element_by_xpath(
                                 '/html/body/div[1]/div/div/div[6]/div[1]/div/ul/li[1]/div/p[2]')
                             detail_price = detail_price.get_attribute('innerText')
-                            print('detail_price >>', detail_price)
+                            print('detailPrice >>', detail_price)
                             price_pyeong = driver.find_element_by_xpath(
                                 '/html/body/div[1]/div/div/div[6]/div[1]/div/ul/li[2]/div/p[2]')
                             price_pyeong = price_pyeong.get_attribute('innerText')
-                            print('price_pyeong>>', price_pyeong)
+                            print('pricePyeong>>', price_pyeong)
 
                             aver_price = driver.find_element_by_xpath(
                                 '/html/body/div[1]/div/div/div[6]/div[1]/div/ul/li[2]/div/p[3]'
                             )
                             aver_price = aver_price.get_attribute('innerText')
-                            print('aver_price', aver_price)
+                            print('averPrice', aver_price)
 
                         except NoSuchElementException:
                             detail_price = None
@@ -189,28 +189,28 @@ def presaleCrawling():
                             term=term,
                             name=name,
                             place=place,
-                            sales_type=sales_type,
-                            sales_price=sales_price,
-                            total_citizen=total_citizen,
-                            sales_citizen=sales_citizen,
-                            min_max_floor=min_max_floor,
-                            complex_scale=complex_scale,
+                            salesType=sales_type,
+                            salesPrice=sales_price,
+                            totalCitizen=total_citizen,
+                            salesCitizen=sales_citizen,
+                            minMaxFloor=min_max_floor,
+                            complexScale=complex_scale,
 
-                            detail_type=detail_type,
+                            detailType=detail_type,
                             constraint=constraint,
                             area=area,
-                            supply_type=supply_type,
-                            constraint_area=constraint_area,
+                            supplyType=supply_type,
+                            constraintArea=constraint_area,
                             recruit=recruit,
                             builder=builder,
-                            max_price=max_price,
+                            maxPrice=max_price,
                             moveIn=moveIn,
                             developer=developer,
-                            constraint_term=constraint_term,
+                            constraintTerm=constraint_term,
 
-                            detail_price=detail_price,
-                            price_pyeong=price_pyeong,
-                            aver_price=aver_price
+                            detailPrice=detail_price,
+                            pricePyeong=price_pyeong,
+                            averPrice=aver_price
                         )
 
                         print(pre_ins, thema_ins.name, '가 생성되었습니다.===================================')
@@ -282,7 +282,7 @@ def presaleCrawling():
                         driver.execute_script("arguments[0].click();", button)
                         driver.switch_to_window(driver.window_handles[1])
                         time.sleep(1)
-                        thema_ins = None
+                        thema_ins = ''
                         #             페이지 크롤링 시작
                         status = driver.find_element_by_xpath('/html/body/div[1]/div/div/div[1]/div/div/div[1]/span[1]')
                         status = status.get_attribute('innerText')
@@ -317,12 +317,12 @@ def presaleCrawling():
                         sales_citizen = driver.find_element_by_xpath(
                             '/html/body/div[1]/div/div/div[1]/div/ul/li[2]/p[2]')
                         sales_citizen = sales_citizen.get_attribute('innerText')
-                        print('sales_citizen >>>> ', sales_citizen)
+                        print('salesCitizen >>>> ', sales_citizen)
 
                         min_max_floor = driver.find_element_by_xpath(
                             '/html/body/div[1]/div/div/div[1]/div/ul/li[3]/p[2]')
                         min_max_floor = min_max_floor.get_attribute('innerText')
-                        print('min_max_floor >>> ', min_max_floor)
+                        print('minMaxFloor >>> ', min_max_floor)
 
                         complex_scale = driver.find_element_by_xpath(
                             '/html/body/div[1]/div/div/div[1]/div/ul/li[4]/p[2]')
@@ -334,7 +334,7 @@ def presaleCrawling():
                         detail_type = driver.find_element_by_xpath(
                             '/html/body/div[1]/div/div/div[3]/div/table/tbody/tr[1]/td[1]')
                         detail_type = detail_type.get_attribute('innerText')
-                        print('detail_type >>> ', detail_type)
+                        print('detailType >>> ', detail_type)
 
                         constraint = driver.find_element_by_xpath(
                             '/html/body/div[1]/div/div/div[3]/div/table/tbody/tr[2]/td[1]')
@@ -349,7 +349,7 @@ def presaleCrawling():
                         supply_type = driver.find_element_by_xpath(
                             '/html/body/div[1]/div/div/div[3]/div/table/tbody/tr[1]/td[2]')
                         supply_type = supply_type.get_attribute('innerText')
-                        print('supply_type >>', supply_type)
+                        print('supplyType >>', supply_type)
 
                         constraint_area = driver.find_element_by_xpath(
                             '/html/body/div[1]/div/div/div[3]/div/table/tbody/tr[2]/td[2]')
@@ -369,7 +369,7 @@ def presaleCrawling():
                         max_price = driver.find_element_by_xpath(
                             '/html/body/div[1]/div/div/div[3]/div/table/tbody/tr[2]/td[3]')
                         max_price = max_price.get_attribute('innerText')
-                        print('max_price >>> ', max_price)
+                        print('maxPrice >>> ', max_price)
 
                         moveIn = driver.find_element_by_xpath(
                             '/html/body/div[1]/div/div/div[3]/div/table/tbody/tr[3]/td[3]')
@@ -384,7 +384,7 @@ def presaleCrawling():
                         constraint_term = driver.find_element_by_xpath(
                             '/html/body/div[1]/div/div/div[3]/div/table/tbody/tr[2]/td[4]')
                         constraint_term = constraint_term.get_attribute('innerText')
-                        print('constraint_term >>>', constraint_term)
+                        print('constraintTerm >>>', constraint_term)
 
                         div_list = driver.find_elements_by_xpath('/html/body/div[1]/div/div/div[4]/div/div/div')
 
@@ -394,17 +394,17 @@ def presaleCrawling():
                             detail_price = driver.find_element_by_xpath(
                                 '/html/body/div[1]/div/div/div[6]/div[1]/div/ul/li[1]/div/p[2]')
                             detail_price = detail_price.get_attribute('innerText')
-                            print('detail_price >>', detail_price)
+                            print('detailPrice >>', detail_price)
                             price_pyeong = driver.find_element_by_xpath(
                                 '/html/body/div[1]/div/div/div[6]/div[1]/div/ul/li[2]/div/p[2]')
                             price_pyeong = price_pyeong.get_attribute('innerText')
-                            print('price_pyeong>>', price_pyeong)
+                            print('pricePyeong>>', price_pyeong)
 
                             aver_price = driver.find_element_by_xpath(
                                 '/html/body/div[1]/div/div/div[6]/div[1]/div/ul/li[2]/div/p[3]'
                             )
                             aver_price = aver_price.get_attribute('innerText')
-                            print('aver_price', aver_price)
+                            print('averPrice', aver_price)
 
                         except NoSuchElementException:
                             detail_price = None
@@ -419,28 +419,28 @@ def presaleCrawling():
                             term=term,
                             name=name,
                             place=place,
-                            sales_type=sales_type,
-                            sales_price=sales_price,
-                            total_citizen=total_citizen,
-                            sales_citizen=sales_citizen,
-                            min_max_floor=min_max_floor,
-                            complex_scale=complex_scale,
+                            salesType=sales_type,
+                            salesPrice=sales_price,
+                            totalCitizen=total_citizen,
+                            salesCitizen=sales_citizen,
+                            minMaxFloor=min_max_floor,
+                            complexScale=complex_scale,
 
-                            detail_type=detail_type,
+                            detailType=detail_type,
                             constraint=constraint,
                             area=area,
-                            supply_type=supply_type,
-                            constraint_area=constraint_area,
+                            supplyType=supply_type,
+                            constraintArea=constraint_area,
                             recruit=recruit,
                             builder=builder,
-                            max_price=max_price,
+                            maxPrice=max_price,
                             moveIn=moveIn,
                             developer=developer,
-                            constraint_term=constraint_term,
+                            constraintTerm=constraint_term,
 
-                            detail_price=detail_price,
-                            price_pyeong=price_pyeong,
-                            aver_price=aver_price
+                            detailPrice=detail_price,
+                            pricePyeong=price_pyeong,
+                            averPrice=aver_price
                         )
 
                         print(pre_ins,'가 생성되었습니다.===================================')
