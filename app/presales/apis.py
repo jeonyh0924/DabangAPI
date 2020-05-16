@@ -13,6 +13,7 @@ class PreSaleViewSet(ModelViewSet):
     queryset = PreSale.objects.all()
     serializer_class = PreSaleSerializer
     filter_backends = [DjangoFilterBackend]
+    filter_fields = ['brand', 'thema']
     search_fields = ['brand', 'thema']
 
 

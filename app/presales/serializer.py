@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.relations import StringRelatedField
 
 from presales.models import PreSale, Brand, Thema, PreSaleImage
 
@@ -22,8 +23,8 @@ class PreSaleImageSerializer(serializers.ModelSerializer):
 
 
 class PreSaleSerializer(serializers.ModelSerializer):
-    brand = BrandSerialzier()
-    thema = ThemaSerialzier()
+    brand = StringRelatedField()
+    thema = StringRelatedField()
     image = serializers.StringRelatedField(source='presaleimage_set', many=True, )
     list = serializers.SerializerMethodField()
 
@@ -59,8 +60,9 @@ class PreSaleTinySerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'status',
-            'detail_type',
-            'supply_type',
+            'detailType',
+            'supplyType',
+            'salesPrice',
             'name',
             'place',
             'term',
