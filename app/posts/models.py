@@ -167,7 +167,7 @@ class SecuritySafetyFacilities(models.Model):
 
 
 class PostLike(models.Model):
-    post = models.ForeignKey('posts.PostRoom', on_delete=models.CASCADE, )
+    post = models.ForeignKey('posts.PostRoom', on_delete=models.CASCADE, related_query_name='postlikes')
     user = models.ForeignKey(
         settings.base.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
