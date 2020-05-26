@@ -72,8 +72,6 @@ class PostRoomViewSet(ModelViewSet):
     queryset = PostRoom.objects.all()
     filter_backends = [DjangoFilterBackend]
     filter_class = PostFilter
-    filterset_fields = ['supplyAreaInt', 'complete']
-    search_fields = ['supplyAreaInt', 'complete']
 
     def get_serializer_class(self):
         if self.action in "create":

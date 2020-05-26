@@ -41,9 +41,3 @@ urlpatterns = [
 
 urlpatterns += static(settings.base.MEDIA_URL, document_root=settings.base.MEDIA_ROOT)
 
-if settings.dev.DEBUG:
-    import debug_toolbar
-
-    urlpatterns += [
-        url(r'^__debug__/', include(debug_toolbar.urls)),
-    ]
