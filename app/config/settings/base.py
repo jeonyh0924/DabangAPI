@@ -26,8 +26,6 @@ STATIC_URL = '/static/'
 
 MEDIA_ROOT = os.path.join(ROOT_DIR, '.media')
 MEDIA_URL = '/media/'
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
 SECRET_JSON = json.load(open(os.path.join(SECRET_DIR, 'secret.json')))
 
@@ -37,9 +35,6 @@ SECRET_KEY = SECRET_JSON['SECRET_KEY']
 FACEBOOK_APP_ID = SECRET_JSON["FACEBOOK_APP_ID"]
 FACEBOOK_APP_SECRET = SECRET_JSON["FACEBOOK_APP_SECRET"]
 KAKAO_APP_ID = SECRET_JSON['KAKAO_APP_ID']
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 
 AUTH_USER_MODEL = 'members.User'

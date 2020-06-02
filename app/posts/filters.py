@@ -5,9 +5,20 @@ from posts.models import PostRoom
 
 
 class PostFilter(filters.FilterSet):
+    """
+    filter를 정의하는 경우, 주요한 2개의 argument
+    name = "" 모델 필드의 이름을 필터링 한다.
+    lookup_expr="" loopup_expr 조건문을 사용하여 조회 필드를 정의한다. 장고에서 구문은
+
+    """
     type = filters.CharFilter(method='filter_types')
     salesForm__type = filters.CharFilter(method='salesForm__types')
     floor = filters.CharFilter(method='filter_floor')
+
+    # 위도 경도
+    # lng = filters.NumericRangeFilter(method='filter_lng')
+    lng = filters.CharFilter(method='filter_lng')
+    # lat = filters
 
     parkingTF = filters.BooleanFilter()
     pet = filters.BooleanFilter()
@@ -41,7 +52,7 @@ class PostFilter(filters.FilterSet):
             'max_depositInt',
             'min_monthlyInt',
             'max_monthlyInt'
-
+            'lng',
         ]
 
     def filter_types(self, queryset, name, value):
@@ -60,4 +71,16 @@ class PostFilter(filters.FilterSet):
         filter_object = Q()
         for floor in value.split(','):
             filter_object |= Q(floor=floor)
+        return queryset.filter(filter_object)
+
+    def filter_lng(self, queryset, name, value):
+        lng, distance = value.split(',')
+        lng = float(lng)
+        distance = int(distance)
+        variable_for_lng = 0.009197
+        boundary = {
+            "max_lng": lng + variable_for_lng * distance,
+            "min_lng": lng - variable_for_lng * distance,
+        }
+        filter_object = Q(lng__gte=boundary['min_lng']) & Q(lng__lte=boundary['max_lng'])
         return queryset.filter(filter_object)
