@@ -18,7 +18,7 @@ class PostFilter(filters.FilterSet):
     # 위도 경도
     # lng = filters.NumericRangeFilter(method='filter_lng')
     lng = filters.CharFilter(method='filter_lng')
-    # lat = filters
+    lat = filters.CharFilter(method='filter_lat')
 
     parkingTF = filters.BooleanFilter()
     pet = filters.BooleanFilter()
@@ -52,7 +52,8 @@ class PostFilter(filters.FilterSet):
             'max_depositInt',
             'min_monthlyInt',
             'max_monthlyInt'
-            'lng',
+            # 'lng',
+            # 'lat',
         ]
 
     def filter_types(self, queryset, name, value):
@@ -74,13 +75,25 @@ class PostFilter(filters.FilterSet):
         return queryset.filter(filter_object)
 
     def filter_lng(self, queryset, name, value):
-        lng, distance = value.split(',')
-        lng = float(lng)
-        distance = int(distance)
+        """
+        여기서, distance를 다른 변수로 받은다음 사용을 할 수 있는지가 궁금합니다.
+        """
+        lng, distance = map(float, value.split(','))
         variable_for_lng = 0.009197
         boundary = {
             "max_lng": lng + variable_for_lng * distance,
             "min_lng": lng - variable_for_lng * distance,
         }
         filter_object = Q(lng__gte=boundary['min_lng']) & Q(lng__lte=boundary['max_lng'])
+        return queryset.filter(filter_object)
+
+    def filter_lat(self, queryset, name, value):
+        lat, distance = map(float, value.split(','))
+        variable_for_lat = 0.0083
+
+        boundary = {
+            "max_lat": lat + variable_for_lat * distance,
+            "min_lat": lat - variable_for_lat * distance,
+        }
+        filter_object = Q(lat__gte=boundary['min_lat']) & Q(lat__lte=boundary['max_lat'])
         return queryset.filter(filter_object)
