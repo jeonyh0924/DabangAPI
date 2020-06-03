@@ -5,7 +5,6 @@ from posts.models import PostRoom
 
 
 class PostFilter(filters.FilterSet):
-
     """
     filter를 정의하는 경우, 주요한 2개의 argument
     name = "" 모델 필드의 이름을 필터링 한다.
@@ -51,9 +50,7 @@ class PostFilter(filters.FilterSet):
             'min_depositInt',
             'max_depositInt',
             'min_monthlyInt',
-            'max_monthlyInt'
-            # 'lng',
-            # 'lat',
+            'max_monthlyInt',
         ]
 
     def filter_types(self, queryset, name, value):
@@ -75,25 +72,25 @@ class PostFilter(filters.FilterSet):
         return queryset.filter(filter_object)
 
     def filter_lng(self, queryset, name, value):
-        """
-        여기서, distance를 다른 변수로 받은다음 사용을 할 수 있는지가 궁금합니다.
-        """
-        lng, distance = map(float, value.split(','))
+        lng = float(value)
         variable_for_lng = 0.009197
+        distance = self.request.query_params.get('distance')
         boundary = {
-            "max_lng": lng + variable_for_lng * distance,
-            "min_lng": lng - variable_for_lng * distance,
+            "max_lng": lng + variable_for_lng * float(distance),
+            "min_lng": lng - variable_for_lng * float(distance),
         }
         filter_object = Q(lng__gte=boundary['min_lng']) & Q(lng__lte=boundary['max_lng'])
         return queryset.filter(filter_object)
 
     def filter_lat(self, queryset, name, value):
-        lat, distance = map(float, value.split(','))
+        lat = float(value)
         variable_for_lat = 0.0083
 
+        distance = self.request.query_params.get('distance')
+
         boundary = {
-            "max_lat": lat + variable_for_lat * distance,
-            "min_lat": lat - variable_for_lat * distance,
+            "max_lat": lat + variable_for_lat * float(distance),
+            "min_lat": lat - variable_for_lat * float(distance),
         }
         filter_object = Q(lat__gte=boundary['min_lat']) & Q(lat__lte=boundary['max_lat'])
         return queryset.filter(filter_object)
