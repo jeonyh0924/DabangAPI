@@ -168,6 +168,7 @@ class PostListSerializer(serializers.ModelSerializer):
             'pk',
             'broker',
             'type',
+            'name',
             'description',
             'address',
             'lng',

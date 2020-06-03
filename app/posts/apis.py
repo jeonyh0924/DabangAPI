@@ -72,8 +72,6 @@ class PostRoomViewSet(ModelViewSet):
     queryset = PostRoom.objects.all()
     filter_backends = [DjangoFilterBackend]
     filter_class = PostFilter
-    filterset_fields = ['supplyAreaInt', 'complete']
-    search_fields = ['supplyAreaInt', 'complete']
 
     def get_serializer_class(self):
         if self.action in "create":
@@ -322,8 +320,9 @@ class ComplexLikeView(RetrieveAPIView):
 @api_view()
 def PostDivisionFilter(request):
     """
-    orm : https://brownbears.tistory.com/63, https://stackoverflow.com/questions/769843/how-do-i-use-and-in-a-django-filter
-
+    기능 구현 참고
+    orm : https://brownbears.tistory.com/63,
+          https://stackoverflow.com/questions/769843/how-do-i-use-and-in-a-django-filter
     """
     variable_for_lat = 0.0083
     variable_for_lng = 0.009197
