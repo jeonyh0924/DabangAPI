@@ -5,6 +5,7 @@ from posts.models import PostRoom
 
 
 class PostFilter(filters.FilterSet):
+
     """
     filter를 정의하는 경우, 주요한 2개의 argument
     name = "" 모델 필드의 이름을 필터링 한다.
@@ -16,7 +17,6 @@ class PostFilter(filters.FilterSet):
     floor = filters.CharFilter(method='filter_floor')
 
     # 위도 경도
-    # lng = filters.NumericRangeFilter(method='filter_lng')
     lng = filters.CharFilter(method='filter_lng')
     lat = filters.CharFilter(method='filter_lat')
 

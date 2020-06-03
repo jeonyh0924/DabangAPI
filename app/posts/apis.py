@@ -322,7 +322,7 @@ def PostDivisionFilter(request):
     """
     기능 구현 참고
     orm : https://brownbears.tistory.com/63,
-    https://stackoverflow.com/questions/769843/how-do-i-use-and-in-a-django-filter
+          https://stackoverflow.com/questions/769843/how-do-i-use-and-in-a-django-filter
     """
     variable_for_lat = 0.0083
     variable_for_lng = 0.009197
