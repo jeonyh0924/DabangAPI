@@ -47,9 +47,9 @@ class BrokerAPIView(APIView):
 #     queryset = ComplexInformation.objects.all()
 #     serializer_class = ComplexInformationSerializer
 class ComplexDetailAPIView(mixins.RetrieveModelMixin,
-                    mixins.UpdateModelMixin,
-                    mixins.DestroyModelMixin,
-                    generics.GenericAPIView):
+                           mixins.UpdateModelMixin,
+                           mixins.DestroyModelMixin,
+                           generics.GenericAPIView):
     queryset = ComplexInformation.objects.all()
     serializer_class = ComplexInformationSerializer
 
@@ -102,7 +102,9 @@ class PostRoomViewSet(ModelViewSet):
 
 class PostCreateAPIVie(APIView):
     def post(self, request):
-        serializer = PostCreateSerializer(data=request.data)
+        serializer = PostCreateSerializer(data=request.data,
+                                          # context={'request': request, }
+                                          )
         if serializer.is_valid():
             # salesForm
             salesForm_type = request.data.get('salesFormType')
