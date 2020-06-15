@@ -6,7 +6,7 @@ import xmltodict
 from django.db.models import Q
 
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import status, generics, permissions
+from rest_framework import status, generics, permissions, mixins
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import APIException
 from rest_framework.generics import RetrieveAPIView, get_object_or_404
@@ -43,9 +43,24 @@ class BrokerAPIView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class ComplexViewSet(ModelViewSet):
+# class ComplexViewSet(ModelViewSet):
+#     queryset = ComplexInformation.objects.all()
+#     serializer_class = ComplexInformationSerializer
+class ComplexDetailAPIView(mixins.RetrieveModelMixin,
+                           mixins.UpdateModelMixin,
+                           mixins.DestroyModelMixin,
+                           generics.GenericAPIView):
     queryset = ComplexInformation.objects.all()
     serializer_class = ComplexInformationSerializer
+
+    def get(self, request, *args, **kwargs):
+        return self.retrieve(request, *args, **kwargs)
+
+    def put(self, request, *args, **kwargs):
+        return self.update(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        return self.destroy(request, *args, **kwargs)
 
 
 class AddressViewSet(ModelViewSet):
@@ -87,7 +102,9 @@ class PostRoomViewSet(ModelViewSet):
 
 class PostCreateAPIVie(APIView):
     def post(self, request):
-        serializer = PostCreateSerializer(data=request.data)
+        serializer = PostCreateSerializer(data=request.data,
+                                          # context={'request': request, }
+                                          )
         if serializer.is_valid():
             # salesForm
             salesForm_type = request.data.get('salesFormType')

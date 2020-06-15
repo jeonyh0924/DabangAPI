@@ -33,7 +33,7 @@ pip install -r requiremens.text
 {
 {
   "SECRET_KEY": "<django key>",
-  "FACEBOOK_APP_ID": <facebook APP ID>,
+  "FACEBOOK_APP_ID": "<facebook APP ID>",
   "FACEBOOK_APP_SECRET": "<facebook app secret>",
   "KAKAO_APP_ID": "< kakao app id>",
   "AWS": {

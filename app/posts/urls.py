@@ -1,7 +1,7 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
-from posts import apis
+from posts import apis, views
 from posts.apis import getBorodCityList, getEupMyunDongList, getSiGunGuList, BrokerAPIView, PostDivisionFilter
 
 urlpatterns_posts = [
@@ -23,11 +23,12 @@ urlpatterns_posts = [
 
     # 방 위도 경도 필터링
     path('distance/', PostDivisionFilter),
+    path('complex/<int:pk>/', apis.ComplexDetailAPIView.as_view()),
 
 ]
 
 router = DefaultRouter()
-router.register('complex', apis.ComplexViewSet)
+# router.register('complex', apis.ComplexViewSet)
 router.register('address', apis.AddressViewSet)
 router.register('salesForm', apis.SalesFormViewSet)
 router.register('maintenance', apis.MaintenanceFeeViewSet)
