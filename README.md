@@ -1,7 +1,9 @@
 # dabang Back-End
+
 ## intro
 > 패스트캠퍼스 다방 클론 프로젝트 
-
+> backend : https://github.com/jeonyh0924/WPS_DabangAPI // https://github.com/Dabang-Clone-FinalProject/WPS_DabangAPI
+> ios : https://github.com/Dabang-Clone-FinalProject
 ### 프로젝트 개발 환경 및 프로그램
 - AWS ECS
 - AWS S3
