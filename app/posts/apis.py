@@ -103,35 +103,29 @@ class PostRoomViewSet(ModelViewSet):
 class PostCreateAPIVie(APIView):
     def post(self, request):
         serializer = PostCreateSerializer(data=request.data,
-                                          # context={'request': request, }
+                                          context={'request': request, }
                                           )
         if serializer.is_valid():
             # salesForm
-            salesForm_type = request.data.get('salesFormType')
-            salesForm_depositChar = request.data.get('depositChar')
-            salesForm_monthlyChar = request.data.get('monthlyChar')
-            salesForm_depositInt = request.data.get('depositInt')
-            salesForm_monthlyInt = request.data.get('monthlyInt')
-
-            salesform_ins = SalesForm.objects.create(
-                type=salesForm_type,
-                depositChar=salesForm_depositChar,
-                monthlyChar=salesForm_monthlyChar,
-                depositInt=salesForm_depositInt,
-                monthlyInt=salesForm_monthlyInt,
-            )
-
-            serializer.save(salesForm=salesform_ins)
+            # salesForm_type = request.data.get('salesFormType')
+            # salesForm_depositChar = request.data.get('depositChar')
+            # salesForm_monthlyChar = request.data.get('monthlyChar')
+            # salesForm_depositInt = request.data.get('depositInt')
+            # salesForm_monthlyInt = request.data.get('monthlyInt')
+            #
+            # salesform_ins = SalesForm.objects.create(
+            #     type=salesForm_type,
+            #     depositChar=salesForm_depositChar,
+            #     monthlyChar=salesForm_monthlyChar,
+            #     depositInt=salesForm_depositInt,
+            #     monthlyInt=salesForm_monthlyInt,
+            # )
+            #
+            serializer.save()
 
             post_pk = serializer.data.get('pk')
             post = PostRoom.objects.get(pk=post_pk)
 
-            # author
-            user = User.objects.get(pk=1)
-            post.author = user
-            # broker
-            broker_ins = Broker.objects.get(pk=1)
-            post.broker = broker_ins
             # address
             loadAddress = request.data.get('loadAddress')
             detailAddress = request.data.get('detailAddress')

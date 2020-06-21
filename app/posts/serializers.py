@@ -1,6 +1,26 @@
+from django.contrib.auth import get_user_model
+from django.contrib.auth.hashers import make_password
 from rest_framework import serializers
+# from members.serializers import UserSerializer
 from .models import PostRoom, PostImage, Broker, MaintenanceFee, RoomOption, PostAddress, RoomSecurity, SalesForm, \
     OptionItem, SecuritySafetyFacilities, ComplexInformation, ComplexImage, RecommendComplex, PostLike, ComplexLike
+
+User = get_user_model()
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = [
+            'pk',
+            'email',
+            'password',
+            'username',
+        ]
+        extra_kwargs = {'password': {'write_only': True}}
+
+    def validate_password(self, value: str):
+        return make_password(value)
 
 
 class ManagementSerializer(serializers.ModelSerializer):
@@ -277,7 +297,6 @@ class PostTinySerializer(serializers.ModelSerializer):
             'floor',
             'optionSet',
 
-
         ]
 
 
@@ -285,11 +304,15 @@ class PostCreateSerializer(serializers.ModelSerializer):
     complex = ComplexInformationSerializer(read_only=True, )
     salesForm = SalesFormSerializer(read_only=True, )
     postimage = serializers.StringRelatedField(source='postimage_set', many=True, read_only=True, )
+    author = UserSerializer(read_only=True, )
+    broker = BrokerSerializer(read_only=True, )
 
     class Meta:
         model = PostRoom
         fields = [
             'pk',
+            'author',
+            'broker',
             'complex',
             'salesForm',
             'type',
@@ -320,6 +343,25 @@ class PostCreateSerializer(serializers.ModelSerializer):
             'complete',
             'postimage',
         ]
+
+    def create(self, validated_data):
+        salesform_ins = SalesForm.objects.create(
+            type=self.context['request'].data.get('salesFormType'),
+            depositChar=self.context['request'].data.get('depositChar'),
+            monthlyChar=self.context['request'].data.get('monthlyChar'),
+            depositInt=self.context['request'].data.get('depositInt'),
+            monthlyInt=self.context['request'].data.get('monthlyInt'),
+        )
+        broker = Broker.objects.get(pk=1)
+        user = User.objects.first()
+        post = PostRoom.objects.create(
+            **validated_data,
+            author=user,
+            broker=broker,
+            salesForm=salesform_ins,
+        )
+
+        return post
 
 
 class PostTestSerializer(serializers.ModelSerializer):
