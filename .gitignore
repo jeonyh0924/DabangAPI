@@ -7,6 +7,9 @@
 # Created by https://www.gitignore.io/api/git,linux,macos,python,virtualenv,pycharm+all
 # Edit at https://www.gitignore.io/?templates=git,linux,macos,python,virtualenv,pycharm+all
 
+# migrations
+migrations/
+
 ### Git ###
 # Created by git for backups. To disable backups in Git:
 # $ git config --global mergetool.keepBackup false
