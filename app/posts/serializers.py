@@ -303,9 +303,12 @@ class PostTinySerializer(serializers.ModelSerializer):
 class PostCreateSerializer(serializers.ModelSerializer):
     complex = ComplexInformationSerializer(read_only=True, )
     salesForm = SalesFormSerializer(read_only=True, )
-    postimage = serializers.StringRelatedField(source='postimage_set', many=True, read_only=True, )
     author = UserSerializer(read_only=True, )
     broker = BrokerSerializer(read_only=True, )
+    postImage = PostImageSerializer(source='post_set', many=True, read_only=True)
+    address = AddressSerializer(read_only=True, allow_null=True)
+    option = OptionSerializer(many=True, read_only=True, )
+    securitySafety = SecuritySafetySerializer(many=True, read_only=True, )
 
     class Meta:
         model = PostRoom
@@ -315,6 +318,7 @@ class PostCreateSerializer(serializers.ModelSerializer):
             'broker',
             'complex',
             'salesForm',
+            'address',
             'type',
             'description',
             'lat',
@@ -341,7 +345,10 @@ class PostCreateSerializer(serializers.ModelSerializer):
             'totalCitizen',
             'totalPark',
             'complete',
-            'postimage',
+            'option',
+            'securitySafety',
+            'postImage',
+
         ]
 
     def create(self, validated_data):
@@ -352,6 +359,12 @@ class PostCreateSerializer(serializers.ModelSerializer):
             depositInt=self.context['request'].data.get('depositInt'),
             monthlyInt=self.context['request'].data.get('monthlyInt'),
         )
+
+        add_ins, __ = PostAddress.objects.get_or_create(
+            loadAddress=self.context['request'].data.get('loadAddress'),
+            detailAddress=self.context['request'].data.get('detailAddress')
+        )
+
         broker = Broker.objects.get(pk=1)
         user = User.objects.first()
         post = PostRoom.objects.create(
@@ -359,8 +372,25 @@ class PostCreateSerializer(serializers.ModelSerializer):
             author=user,
             broker=broker,
             salesForm=salesform_ins,
+            address=add_ins,
         )
 
+        options = self.context['request'].data.get('options')
+        if options:
+            options = options.split(',')
+            for option in options:
+                option_ins = OptionItem.objects.get(name=option)
+                post.option.add(option_ins)
+        security_safetys = self.context['request'].data.get('security_safetys')
+        if security_safetys:
+            security_safetys = security_safetys.split(',')
+            for ss in security_safetys:
+                ss_ins = SecuritySafetyFacilities.objects.get(name=ss)
+                post.securitySafety.add(ss_ins)
+
+        images_data = self.context['request'].FILES
+        for image_data in images_data.getlist('image'):
+            PostImage.objects.create(post=post, image=image_data)
         return post
 
 
