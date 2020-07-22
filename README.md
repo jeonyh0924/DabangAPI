@@ -6,6 +6,9 @@
 > backend : https://github.com/jeonyh0924/WPS_DabangAPI // https://github.com/Dabang-Clone-FinalProject/WPS_DabangAPI
 
 > ios : https://github.com/Dabang-Clone-FinalProject
+
+> youtube link : https://www.youtube.com/watch?v=demB9_7O5U4&feature=youtu.be
+
 ### 프로젝트 개발 환경 및 프로그램
 - AWS ECS
 - AWS S3
