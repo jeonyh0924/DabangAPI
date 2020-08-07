@@ -90,7 +90,7 @@ class PostRoomViewSet(ModelViewSet):
 
     def get_serializer_class(self):
         if self.action in "create":
-            serializer_class = PostTestSerializer
+            serializer_class = PostCreateSerializer
             return serializer_class
         if self.action in "list":
             serializer_class = PostTinySerializer
@@ -99,85 +99,10 @@ class PostRoomViewSet(ModelViewSet):
             serializer_class = PostListSerializer
             return serializer_class
 
-
-class PostCreateAPIVie(APIView):
-    def post(self, request):
-        serializer = PostCreateSerializer(data=request.data,
-                                          # context={'request': request, }
-                                          )
-        if serializer.is_valid():
-            # salesForm
-            salesForm_type = request.data.get('salesFormType')
-            salesForm_depositChar = request.data.get('depositChar')
-            salesForm_monthlyChar = request.data.get('monthlyChar')
-            salesForm_depositInt = request.data.get('depositInt')
-            salesForm_monthlyInt = request.data.get('monthlyInt')
-
-            salesform_ins = SalesForm.objects.create(
-                type=salesForm_type,
-                depositChar=salesForm_depositChar,
-                monthlyChar=salesForm_monthlyChar,
-                depositInt=salesForm_depositInt,
-                monthlyInt=salesForm_monthlyInt,
-            )
-
-            serializer.save(salesForm=salesform_ins)
-
-            post_pk = serializer.data.get('pk')
-            post = PostRoom.objects.get(pk=post_pk)
-
-            # author
-            user = User.objects.get(pk=1)
-            post.author = user
-            # broker
-            broker_ins = Broker.objects.get(pk=1)
-            post.broker = broker_ins
-            # address
-            loadAddress = request.data.get('loadAddress')
-            detailAddress = request.data.get('detailAddress')
-            add_ins, __ = PostAddress.objects.get_or_create(loadAddress=loadAddress, detailAddress=detailAddress)
-            post.address = add_ins
-
-            # complex
-            compelx_ins = None
-            post.complex = None
-
-            # options
-            options = request.data.get('options')
-            if options:
-                options = options.split(',')
-                for option in options:
-                    option_ins = OptionItem.objects.get(name=option)
-                    post.option.add(option_ins)
-
-            # security safety
-            security_safetys = request.data.get('security_safetys')
-            if security_safetys:
-                security_safetys = security_safetys.split(',')
-                for ss in security_safetys:
-                    ss_ins = SecuritySafetyFacilities.objects.get(name=ss)
-                    post.securitySafety.add(ss_ins)
-
-            post.save()
-
-            # 이미지 relation  로직
-            post_images = request.FILES
-            if post_images:
-                POSTS_IMAGE_DIR = os.path.join(MEDIA_ROOT, f'.posts/postroom/')
-                # if not os.path.exists(POSTS_IMAGE_DIR):
-                #     os.makedirs(POSTS_IMAGE_DIR, exist_ok=True)
-                for index, image_data in enumerate(post_images.getlist('image')):
-                    #
-                    image_save_name = os.path.join(POSTS_IMAGE_DIR, f'{post_pk}_{index}.jpg')
-                    # urllib.request.urlretrieve(post_url, image_save_name)
-                    # f = open(os.path.join(POSTS_IMAGE_DIR, f'{post_pk}_{index}.jpg'), 'rb')
-                    PostImage.objects.create(
-                        image=image_data,
-                        post=post
-                    )
-                    # f.close()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def perform_create(self, serializer):
+        serializer = self.get_serializer(data=self.request.data, context={'request': self.request})
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
 
 
 class PostDetailTestAPIView(APIView):
@@ -341,8 +266,10 @@ def PostDivisionFilter(request):
     orm : https://brownbears.tistory.com/63,
           https://stackoverflow.com/questions/769843/how-do-i-use-and-in-a-django-filter
     """
-    variable_for_lat = 0.0083
-    variable_for_lng = 0.009197
+    variable_for_lat = 0.0083  # 반경 1 키로
+    variable_for_lng = 0.009197  # 반경 1 키로
+
+    # 키로당 단위로 받는다는거
 
     request_lng = request.query_params.get('reqLat')
     request_lat = request.query_params.get('reqLng')
