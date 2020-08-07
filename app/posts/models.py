@@ -215,7 +215,7 @@ class PostImage(models.Model):
         'posts.postRoom',
         verbose_name='해당 게시글',
         on_delete=models.CASCADE,
-        related_name='post_set',
+        related_name='images',
     )
 
     def __str__(self):

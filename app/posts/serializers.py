@@ -179,7 +179,7 @@ class PostListSerializer(serializers.ModelSerializer):
     securitySafety_set = serializers.StringRelatedField(source='securitySafety', many=True, read_only=True)
     address = AddressSerializer(read_only=True, allow_null=True)
     salesForm = SalesFormSerializer(read_only=True)
-    postimage = serializers.StringRelatedField(source='postimage_set', many=True, read_only=True, )
+    postimage = serializers.StringRelatedField(source='images', many=True, read_only=True, )
     complex = ComplexInformationSerializer(read_only=True, )
 
     class Meta:
@@ -271,7 +271,7 @@ class ComplexLikeUserSerializer(serializers.ModelSerializer):
 class PostTinySerializer(serializers.ModelSerializer):
     address = AddressSerializer(read_only=True, allow_null=True)
     salesForm = SalesFormSerializer(read_only=True)
-    postimage = serializers.StringRelatedField(source='postimage_set', many=True)
+    postimage = serializers.StringRelatedField(source='images', many=True)
     complex = ComplexTinySerializer(read_only=True, )
     optionSet = serializers.StringRelatedField(source='option', many=True, read_only=True)
 
